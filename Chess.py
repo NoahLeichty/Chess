@@ -56,5 +56,28 @@ def place_pieces():
         piece_label.grid(row=0, column=j)
 place_pieces()
 
+# Function to handle piece movement
+def move_piece(event):
+    # Get the clicked square's row and column
+    row = event.widget.grid_info()['row']
+    column = event.widget.grid_info()['column']
+
+    # Print the clicked square's position
+    print(f"Clicked square: ({row}, {column})")
+    
+    # Check if a piece is clicked
+    piece = root.grid_slaves(row=row, column=column)
+    if piece:
+        piece = piece[0]
+        # If a piece is clicked, move it to the next square
+        next_row = (row + 1)
+        next_column = (column + 1)
+        piece.grid(row=next_row, column=column)
+    else:
+        print("No piece at this square.")
+
+# Bind the click event to move_piece function
+root.bind("<Button-1>", move_piece)
+
 # Start the main loop
 root.mainloop()
