@@ -67,14 +67,10 @@ def move_piece(event):
     
     # Check if a piece is clicked
     piece = root.grid_slaves(row=row, column=column)
+    
     if piece:
         piece = piece[0]
-        # If a piece is clicked, move it to the next square
-        next_row = (row + 1)
-        next_column = (column + 1)
-        piece.grid(row=next_row, column=column)
-    else:
-        print("No piece at this square.")
+        piece.grid(row=row+1, column=column) 
 
 # Bind the click event to move_piece function
 root.bind("<Button-1>", move_piece)
