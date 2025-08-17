@@ -13,7 +13,7 @@ root.geometry("600x600")
 for i in range(8):
     for j in range(8):
         if (i + j) % 2 == 0:
-            color = "white"
+            color = "light grey"
         else:
             color = "dark blue"
         square = tk.Frame(root, width=75, height=75, bg=color)
@@ -35,16 +35,16 @@ load_pieces()
 def place_pieces():
     # Places white pawns
     for j in range(8):
-        pawn = tk.Label(root, image=pieces["wp"])
-        pawn.grid(row=6, column=j)
+        Wpawn = tk.Label(root, image=pieces["wp"])
+        Wpawn.grid(row=6, column=j)
     
     # Places black pawns
     for j in range(8):
-        pawn = tk.Label(root, image=pieces["bp"])
-        pawn.grid(row=1, column=j)
+        Bpawn = tk.Label(root, image=pieces["bp"])
+        Bpawn.grid(row=1, column=j)
 
     # Place white pieces on the first row
-    piece_order = ["wr", "wn", "wb", "wq", "wk", "wb", "wk", "wr"]
+    piece_order = ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"]
     for j, piece in enumerate(piece_order):
         piece_label = tk.Label(root, image=pieces[piece])
         piece_label.grid(row=7, column=j)
@@ -70,10 +70,16 @@ def move_piece(event):
     
     if piece:
         piece = piece[0]
-        piece.grid(row=row+1, column=column) 
+        new_row = int(row) + 1 if int(row) < 7 else int(row)
+        piece.grid(row=new_row, column=column)
+            
 
-# Bind the click event to move_piece function
-root.bind("<Button-1>", move_piece)
+# Bind the chessboard squares to the move_piece function
+for i in range(8):
+    for j in range(8):
+        square = root.grid_slaves(row=i, column=j)
+        if square:
+            square[0].bind("<Button-1>", move_piece)
 
 # Start the main loop
 root.mainloop()
