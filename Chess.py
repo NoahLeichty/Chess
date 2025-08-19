@@ -57,7 +57,7 @@ def place_pieces():
 place_pieces()
 
 # Function to handle piece movement
-def move_piece(event):
+def move_pieces(event):
     # Get the clicked square's row and column
     row = event.widget.grid_info()['row']
     column = event.widget.grid_info()['column']
@@ -67,19 +67,14 @@ def move_piece(event):
     
     # Check if a piece is clicked
     piece = root.grid_slaves(row=row, column=column)
-    
+    Wp = root.grid_slaves(row=row, column=column)
+
     if piece:
         piece = piece[0]
-        new_row = int(row) + 1 if int(row) < 7 else int(row)
-        piece.grid(row=new_row, column=column)
-            
-
-# Bind the chessboard squares to the move_piece function
-for i in range(8):
-    for j in range(8):
-        square = root.grid_slaves(row=i, column=j)
-        if square:
-            square[0].bind("<Button-1>", move_piece)
+        piece.grid(row=row-1, column=column)
+    
+    
+root.bind("<Button-1>", move_pieces)
 
 # Start the main loop
 root.mainloop()
