@@ -65,7 +65,7 @@ def move_pieces(event):
     # Print the clicked square's position
     print(f"Clicked square: ({row}, {column})")
     
-   # white pawn moving forward
+    # white pawn moving forward
     if event.widget.cget("image") == str(pieces["wp"]):
         if row > 0:  # Ensure it doesn't go off the board
             event.widget.grid(row=row-1, column=column)
@@ -76,8 +76,15 @@ def move_pieces(event):
             event.widget.grid(row=row+1, column=column)
     else:
         print("This piece cannot be moved yet.")
-    
 
+    #This also works and is an option that might be better
+    #for i in range(8):
+        #for j in range(8):
+            # Update the position of the piece on the board
+            #if event.widget.cget("image") == str(pieces["wp"]):
+                #event.widget.grid(row=row-1, column=column)
+            #elif event.widget.cget("image") == str(pieces["bp"]):
+                #event.widget.grid(row=row+1, column=column)
     
 # When clicked piece moves
 root.bind("<Button-1>", move_pieces)
