@@ -2,6 +2,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 import os
+import chess
 
 # opens frame for chess game
 root = tk.Tk()
@@ -67,21 +68,22 @@ def move_pieces(event):
     
     # white pawn moving forward
     if event.widget.cget("image") == str(pieces["wp"]):
-        if row > 0: # prevent moving off the board
+        # Check if the square in front is empty
+        if row > 0:
             event.widget.grid(row=row-1, column=column)
     # black pawn moving forward
     elif event.widget.cget("image") == str(pieces["bp"]):
-        if row < 7: 
+        if row < 7 and not root.grid_slaves(row=row+1, column=column):
             event.widget.grid(row=row+1, column=column)
     else:
         print("This piece cannot be moved yet.")
 
     # move white pawn to clicked square
-    for j in range(8):
-        if root.grid_slaves(row=6, column=j):
-            Wpawn = root.grid_slaves(row=6, column=column)[0]
-            Wpawn.grid(row=row, column=column)
-            break
+    #for j in range(8):
+        #if root.grid_slaves(row=6, column=j):
+            #Wpawn = root.grid_slaves(row=6, column=column)[0]
+            #Wpawn.grid(row=row, column=column)
+            #break
     
 # When clicked piece moves
 root.bind("<Button-1>", move_pieces)
