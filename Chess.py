@@ -49,6 +49,91 @@ def is_valid_move(start_pos, end_pos, board):
     end_row, end_col = end_pos
     piece = board[start_row][start_col]
     target = board[end_row][end_col]
+
+    # Basic validation: ensure the piece exists and the move is within bounds
+    if not (0 <= start_row < 8 and 0 <= start_col < 8 and 0 <= end_row < 8 and 0 <= end_col < 8):
+        return False
+    
+    # White pawn movement
+    if piece == 'wP':
+        if start_col == end_col and target is None:
+            if start_row - end_row == 1:
+                return True
+            if start_row == 6 and start_row - end_row == 2 and board[start_row - 1][start_col] is None:
+                return True
+        elif abs(start_col - end_col) == 1 and start_row - end_row == 1 and target is not None and target.startswith('b'):
+            return True
+        return False
+    # Black pawn movement
+    elif piece == 'bP':
+        if start_col == end_col and target is None:
+            if end_row - start_row == 1:
+                return True
+            if start_row == 1 and end_row - start_row == 2 and board[start_row + 1][start_col] is None:
+                return True
+        elif abs(start_col - end_col) == 1 and end_row - start_row == 1 and target is not None and target.startswith('w'):
+            return True
+        return False
+    # Rook movement
+    elif piece in ['wR', 'bR']:
+        if start_row != end_row and start_col != end_col:
+            return False
+        step_row = 0 if start_row == end_row else (1 if end_row > start_row else -1)
+        step_col = 0 if start_col == end_col else (1 if end_col > start_col else -1)
+        r, c = start_row + step_row, start_col + step_col
+        while (r, c) != (end_row, end_col):
+            if board[r][c] is not None:
+                return False
+            r += step_row
+            c += step_col
+        if target is None or (piece.startswith('w') and target.startswith('b')) or (piece.startswith('b') and target.startswith('w')):
+            return True
+        return False
+    # Knight movement
+    elif piece in ['wN', 'bN']:
+        if (abs(start_row - end_row), abs(start_col - end_col)) in [(2, 1), (1, 2)]:
+            if target is None or (piece.startswith('w') and target.startswith('b')) or (piece.startswith('b') and target.startswith('w')):
+                return True
+        return False
+    elif piece in ['wB', 'bB']:
+        if abs(start_row - end_row) != abs(start_col - end_col):
+            return False
+        step_row = 1 if end_row > start_row else -1
+        step_col = 1 if end_col > start_col else -1
+        r, c = start_row + step_row, start_col + step_col
+        while (r, c) != (end_row, end_col):
+            if board[r][c] is not None:
+                return False
+            r += step_row
+            c += step_col
+        if target is None or (piece.startswith('w') and target.startswith('b')) or (piece.startswith('b') and target.startswith('w')):
+            return True
+        return False
+    # Queen movement
+    elif piece in ['wQ', 'bQ']:
+        if start_row == end_row or start_col == end_col:
+            step_row = 0 if start_row == end_row else (1 if end_row > start_row else -1)
+            step_col = 0 if start_col == end_col else (1 if end_col > start_col else -1)
+        elif abs(start_row - end_row) == abs(start_col - end_col):
+            step_row = 1 if end_row > start_row else -1
+            step_col = 1 if end_col > start_col else -1
+        else:
+            return False
+        r, c = start_row + step_row, start_col + step_col
+        while (r, c) != (end_row, end_col):
+            if board[r][c] is not None:
+                return False
+            r += step_row
+            c += step_col
+        if target is None or (piece.startswith('w') and target.startswith('b')) or (piece.startswith('b') and target.startswith('w')):
+            return True
+        return False
+    # King movement
+    elif piece in ['wK', 'bK']:
+        if max(abs(start_row - end_row), abs(start_col - end_col)) == 1:
+            if target is None or (piece.startswith('w') and target.startswith('b')) or (piece.startswith('b') and target.startswith('w')):
+                return True
+        return False
     if piece is None:
         return False
     return True
