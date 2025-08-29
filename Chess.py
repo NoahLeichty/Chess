@@ -54,6 +54,14 @@ def is_valid_move(start_pos, end_pos, board):
     if not (0 <= start_row < 8 and 0 <= start_col < 8 and 0 <= end_row < 8 and 0 <= end_col < 8):
         return False
     
+    current_turn = "w" if piece and piece.startswith('w') else "b" if piece and piece.startswith('b') else None
+
+    if piece is None or (target is not None and target.startswith(current_turn)):
+        return False
+    
+    white_turn = True
+    
+
     # White pawn movement
     if piece == 'wP':
         if start_col == end_col and target is None:
@@ -134,14 +142,12 @@ def is_valid_move(start_pos, end_pos, board):
             if target is None or (piece.startswith('w') and target.startswith('b')) or (piece.startswith('b') and target.startswith('w')):
                 return True
         return False
+    else:
+        False
+
     if piece is None:
         return False
     return True
-
-# Highlight the selected square
-if selected_square:
-    highlight_row, highlight_col = selected_square
-    pygame.draw.rect(screen, (0, 255, 0), (highlight_col * square_size, highlight_row * square_size, square_size, square_size))
 
 # Game loop flag
 running = True
