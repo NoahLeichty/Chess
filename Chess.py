@@ -6,7 +6,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Chess Board")
 
 square_size = screen_width // 8
-colors = [(255, 255, 255), (0, 0, 139)] # White and a dark grey
+colors = [(255, 255, 255), (0, 0, 139)] # White and a dark blue
 
 piece_images = {
     "wP": pygame.image.load("Assets/wp.png"),
@@ -45,9 +45,18 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Pygame Chess")
 
 def is_valid_move(start_pos, end_pos, board):
-    # This is where your chess move validation logic goes
-    # For this simple example, we'll just allow any move for demonstration
+    start_row, start_col = start_pos
+    end_row, end_col = end_pos
+    piece = board[start_row][start_col]
+    target = board[end_row][end_col]
+    if piece is None:
+        return False
     return True
+
+# Highlight the selected square
+if selected_square:
+    highlight_row, highlight_col = selected_square
+    pygame.draw.rect(screen, (0, 255, 0), (highlight_col * square_size, highlight_row * square_size, square_size, square_size))
 
 # Game loop flag
 running = True
@@ -66,18 +75,22 @@ while running:
 
             if selected_square is None:
                 # First click: select a piece
-                if board[row][col] != '--': # Assuming '--' means empty
+                if board[row][col] != None:
                     selected_square = (row, col)
             else:
                 # Second click: move the selected piece
                 start_row, start_col = selected_square
                 end_row, end_col = row, col
+                print(f"Moving from {selected_square} to {(end_row, end_col)}")
 
                 if is_valid_move((start_row, start_col), (end_row, end_col), board):
                         # Perform the move
                         board[end_row][end_col] = board[start_row][start_col]
-                        board[start_row][start_col] = '--'
+                        board[start_row][start_col] = None
                         selected_square = None # Deselect
+                else:
+                    print("Invalid move")
+                    selected_square = None # Deselect
 
     for row in range(8):
         for col in range(8):
