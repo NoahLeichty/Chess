@@ -49,18 +49,19 @@ def is_valid_move(start_pos, end_pos, board):
     end_row, end_col = end_pos
     piece = board[start_row][start_col]
     target = board[end_row][end_col]
+    current_piece = board[start_row][start_col]
 
     # Basic validation: ensure the piece exists and the move is within bounds
     if not (0 <= start_row < 8 and 0 <= start_col < 8 and 0 <= end_row < 8 and 0 <= end_col < 8):
         return False
     
-    current_turn = "w" if piece and piece.startswith('w') else "b" if piece and piece.startswith('b') else None
-
-    if piece is None or (target is not None and target.startswith(current_turn)):
-        return False
-    
     white_turn = True
-    
+    black_turn = False # Change turns after each valid move
+
+    if white_turn == True and piece is not None and piece.startswith('b'):
+        return False
+    if black_turn == True and piece is not None and piece.startswith('w'):
+        return False
 
     # White pawn movement
     if piece == 'wP':
@@ -80,7 +81,7 @@ def is_valid_move(start_pos, end_pos, board):
             if start_row == 1 and end_row - start_row == 2 and board[start_row + 1][start_col] is None:
                 return True
         elif abs(start_col - end_col) == 1 and end_row - start_row == 1 and target is not None and target.startswith('w'):
-            return True
+            return True 
         return False
     # Rook movement
     elif piece in ['wR', 'bR']:
@@ -173,12 +174,14 @@ while running:
                 start_row, start_col = selected_square
                 end_row, end_col = row, col
                 print(f"Moving from {selected_square} to {(end_row, end_col)}")
-
+                
+                white_turn = True 
                 if is_valid_move((start_row, start_col), (end_row, end_col), board):
                         # Perform the move
                         board[end_row][end_col] = board[start_row][start_col]
                         board[start_row][start_col] = None
                         selected_square = None # Deselect
+                        white_turn = not white_turn
                 else:
                     print("Invalid move")
                     selected_square = None # Deselect
