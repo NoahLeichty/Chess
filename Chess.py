@@ -8,6 +8,7 @@ pygame.display.set_caption("Chess Board")
 square_size = screen_width // 8
 colors = [(255, 255, 255), (0, 0, 139)] # White and a dark blue
 
+# Load piece images
 piece_images = {
     "wP": pygame.image.load("Assets/wp.png"),
     "wR": pygame.image.load("Assets/wr.png"),
@@ -27,7 +28,7 @@ piece_images = {
 for piece_type, image in piece_images.items():
     piece_images[piece_type] = pygame.transform.scale(image, (square_size, square_size))
 
-# Initial board setup (simplified example)
+# Initial board setup
 board = [
     ['bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR'],
     ['bP', 'bP', 'bP', 'bP', 'bP', 'bP', 'bP', 'bP'],
@@ -55,12 +56,15 @@ def is_valid_move(start_pos, end_pos, board):
     if not (0 <= start_row < 8 and 0 <= start_col < 8 and 0 <= end_row < 8 and 0 <= end_col < 8):
         return False
     
+    if piece is None:
+        return False
+    
     white_turn = True
-    black_turn = False # Change turns after each valid move
 
+    # Only white can move
     if white_turn == True and piece is not None and piece.startswith('b'):
         return False
-    if black_turn == True and piece is not None and piece.startswith('w'):
+    elif white_turn == False and piece is not None and piece.startswith('w'):
         return False
 
     # White pawn movement
@@ -175,13 +179,26 @@ while running:
                 end_row, end_col = row, col
                 print(f"Moving from {selected_square} to {(end_row, end_col)}")
                 
-                white_turn = True 
+                
                 if is_valid_move((start_row, start_col), (end_row, end_col), board):
                         # Perform the move
                         board[end_row][end_col] = board[start_row][start_col]
                         board[start_row][start_col] = None
                         selected_square = None # Deselect
-                        white_turn = not white_turn
+
+                        # Pawn promotion to queen
+                        if board[end_row][end_col] == 'wP' and end_row == 0:
+                            board[end_row][end_col] = 'wQ'
+
+                        if board[end_row][end_col] == 'bP' and end_row == 7:
+                            board[end_row][end_col] = 'bQ'
+
+                        # Switch turns
+                        if board[end_row][end_col].startswith('w'):
+                            white_turn = False
+                        elif board[end_row][end_col].startswith('b'):
+                            white_turn = True
+
                 else:
                     print("Invalid move")
                     selected_square = None # Deselect
