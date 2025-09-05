@@ -59,6 +59,7 @@ def is_valid_move(start_pos, end_pos, board):
     if piece is None:
         return False
     
+    global white_turn
     white_turn = True
 
     # Only white can move
@@ -101,6 +102,7 @@ def is_valid_move(start_pos, end_pos, board):
             c += step_col
         if target is None or (piece.startswith('w') and target.startswith('b')) or (piece.startswith('b') and target.startswith('w')):
             return True
+        white_turn = not white_turn
         return False
     # Knight movement
     elif piece in ['wN', 'bN']:
@@ -181,23 +183,17 @@ while running:
                 
                 
                 if is_valid_move((start_row, start_col), (end_row, end_col), board):
-                        # Perform the move
-                        board[end_row][end_col] = board[start_row][start_col]
-                        board[start_row][start_col] = None
-                        selected_square = None # Deselect
+                    # Perform the move
+                    board[end_row][end_col] = board[start_row][start_col]
+                    board[start_row][start_col] = None
+                    selected_square = None # Deselect
 
-                        # Pawn promotion to queen
-                        if board[end_row][end_col] == 'wP' and end_row == 0:
-                            board[end_row][end_col] = 'wQ'
+                    # Pawn promotion to queen
+                    if board[end_row][end_col] == 'wP' and end_row == 0:
+                        board[end_row][end_col] = 'wQ'
 
-                        if board[end_row][end_col] == 'bP' and end_row == 7:
-                            board[end_row][end_col] = 'bQ'
-
-                        # Switch turns
-                        if board[end_row][end_col].startswith('w'):
-                            white_turn = False
-                        elif board[end_row][end_col].startswith('b'):
-                            white_turn = True
+                    if board[end_row][end_col] == 'bP' and end_row == 7:
+                        board[end_row][end_col] = 'bQ'
 
                 else:
                     print("Invalid move")
