@@ -77,6 +77,10 @@ def is_valid_move(start_pos, end_pos, board):
                 return True
         elif abs(start_col - end_col) == 1 and start_row - end_row == 1 and target is not None and target.startswith('b'):
             return True
+        elif abs(start_col - end_col) == 1 and start_row - end_row == 1 and target is None:
+            # En passant (simplified)
+            if start_row == 3 and board[start_row][end_col] == 'bP':
+                return True
         return False
     # Black pawn movement
     elif piece == 'bP':
@@ -87,6 +91,10 @@ def is_valid_move(start_pos, end_pos, board):
                 return True
         elif abs(start_col - end_col) == 1 and end_row - start_row == 1 and target is not None and target.startswith('w'):
             return True 
+        elif abs(start_col - end_col) == 1 and end_row - start_row == 1 and target is None:
+            # En passant (simplified)
+            if start_row == 4 and board[start_row][end_col] == 'wP':
+                return True
         return False
     # Rook movement
     elif piece in ['wR', 'bR']:
@@ -102,7 +110,6 @@ def is_valid_move(start_pos, end_pos, board):
             c += step_col
         if target is None or (piece.startswith('w') and target.startswith('b')) or (piece.startswith('b') and target.startswith('w')):
             return True
-        white_turn = not white_turn
         return False
     # Knight movement
     elif piece in ['wN', 'bN']:
@@ -156,6 +163,15 @@ def is_valid_move(start_pos, end_pos, board):
         return False
     return True
 
+def make_move(start_pos, end_pos, board):
+    start_row, start_col = start_pos
+    end_row, end_col = end_pos
+    piece = board[start_row][start_col]
+    board[end_row][end_col] = piece
+    board[start_row][start_col] = None
+
+    is_valid_move.white_turn = not white_turn
+
 # Game loop flag
 running = True
 
@@ -183,9 +199,7 @@ while running:
                 
                 
                 if is_valid_move((start_row, start_col), (end_row, end_col), board):
-                    # Perform the move
-                    board[end_row][end_col] = board[start_row][start_col]
-                    board[start_row][start_col] = None
+                    make_move((start_row, start_col), (end_row, end_col), board)
                     selected_square = None # Deselect
 
                     # Pawn promotion to queen
@@ -194,6 +208,23 @@ while running:
 
                     if board[end_row][end_col] == 'bP' and end_row == 7:
                         board[end_row][end_col] = 'bQ'
+                    
+                    # Castling (simplified, no checks for check conditions)
+                    if board[end_row][end_col] == 'wK' and start_row == 7 and start_col == 4:
+                        if board[end_row] == 7 and board[end_col] == 6:
+                            board[7][5] = 'wR'
+                            board[7][6] = 'wK'
+                            board[7][7] = None
+                        elif end_row == 7 and end_col == 2:
+                            board[7][3] = 'wR'
+                            board[7][0] = None
+                    if board[end_row][end_col] == 'bK' and start_row == 0 and start_col == 4:
+                        if end_row == 0 and end_col == 6:
+                            board[0][5] = 'bR'
+                            board[0][7] = None
+                        elif end_row == 0 and end_col == 2:
+                            board[0][3] = 'bR'
+                            board[0][0] = None
 
                 else:
                     print("Invalid move")
