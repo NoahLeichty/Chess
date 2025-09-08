@@ -62,10 +62,11 @@ def is_valid_move(start_pos, end_pos, board):
     global white_turn
     white_turn = True
 
+
     # Only white can move
-    if white_turn == True and piece is not None and piece.startswith('b'):
+    if white_turn == True and piece.startswith('b'):
         return False
-    elif white_turn == False and piece is not None and piece.startswith('w'):
+    elif white_turn == False and piece.startswith('w'):
         return False
 
     # White pawn movement
@@ -169,8 +170,6 @@ def make_move(start_pos, end_pos, board):
     piece = board[start_row][start_col]
     board[end_row][end_col] = piece
     board[start_row][start_col] = None
-
-    is_valid_move.white_turn = not white_turn
 
 # Game loop flag
 running = True
