@@ -51,6 +51,7 @@ def is_valid_move(start_pos, end_pos, board):
     piece = board[start_row][start_col]
     target = board[end_row][end_col]
     current_piece = board[start_row][start_col]
+    move = target
 
     # Basic validation: ensure the piece exists and the move is within bounds
     if not (0 <= start_row < 8 and 0 <= start_col < 8 and 0 <= end_row < 8 and 0 <= end_col < 8):
@@ -62,12 +63,20 @@ def is_valid_move(start_pos, end_pos, board):
     global white_turn
     white_turn = True
 
-
+    if piece.startswith('w') and move:
+        white_turn = False
+    if piece.startswith('b') and move:
+        white_turn = True
+    
     # Only white can move
     if white_turn == True and piece.startswith('b'):
         return False
+    elif white_turn == True and piece.startswith('w'):
+        return True
     elif white_turn == False and piece.startswith('w'):
         return False
+    elif white_turn == True and piece.startswith('b'):
+        return True
 
     # White pawn movement
     if piece == 'wP':
