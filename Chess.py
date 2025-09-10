@@ -51,7 +51,6 @@ def is_valid_move(start_pos, end_pos, board):
     piece = board[start_row][start_col]
     target = board[end_row][end_col]
     current_piece = board[start_row][start_col]
-    move = target
 
     # Basic validation: ensure the piece exists and the move is within bounds
     if not (0 <= start_row < 8 and 0 <= start_col < 8 and 0 <= end_row < 8 and 0 <= end_col < 8):
@@ -62,11 +61,6 @@ def is_valid_move(start_pos, end_pos, board):
     
     global white_turn
     white_turn = True
-
-    if piece.startswith('w') and move:
-        white_turn = False
-    if piece.startswith('b') and move:
-        white_turn = True
     
     # Only white can move
     if white_turn == True and piece.startswith('b'):
@@ -85,12 +79,11 @@ def is_valid_move(start_pos, end_pos, board):
                 return True
             if start_row == 6 and start_row - end_row == 2 and board[start_row - 1][start_col] is None:
                 return True
+            else:
+                return False
         elif abs(start_col - end_col) == 1 and start_row - end_row == 1 and target is not None and target.startswith('b'):
             return True
-        elif abs(start_col - end_col) == 1 and start_row - end_row == 1 and target is None:
-            # En passant (simplified)
-            if start_row == 3 and board[start_row][end_col] == 'bP':
-                return True
+        
         return False
     # Black pawn movement
     elif piece == 'bP':
@@ -180,6 +173,17 @@ def make_move(start_pos, end_pos, board):
     board[end_row][end_col] = piece
     board[start_row][start_col] = None
 
+# Button to pick promotion pieces
+button_rect = pygame.Rect(300, 250, 200, 50)  # x, y, width, height
+button_color = (0, 128, 255)  # Blue
+button_text_color = (255, 255, 255) # White
+font = pygame.font.Font(None, 36)
+button_text = font.render("Click Me!", True, button_text_color)
+text_rect = button_text.get_rect(center=button_rect.center)
+
+def on_button_click():
+    board[end_row][end_col] = 'wQ'
+
 # Game loop flag
 running = True
 
@@ -207,13 +211,14 @@ while running:
                 
                 
                 if is_valid_move((start_row, start_col), (end_row, end_col), board):
-                    make_move((start_row, start_col), (end_row, end_col), board)
+                    if make_move((start_row, start_col), (end_row, end_col), board):
+                        global white_turn
+                        white_turn = not white_turn
                     selected_square = None # Deselect
 
                     # Pawn promotion to queen
                     if board[end_row][end_col] == 'wP' and end_row == 0:
                         board[end_row][end_col] = 'wQ'
-
                     if board[end_row][end_col] == 'bP' and end_row == 7:
                         board[end_row][end_col] = 'bQ'
                     
@@ -248,7 +253,12 @@ while running:
             piece = board[row][col]
             if piece:
                 screen.blit(piece_images[piece], (col * square_size, row * square_size))
-                pygame.display.flip()
+
+    #pygame.draw.rect(screen, button_color, button_rect)
+    #screen.blit(button_text, text_rect)
+    
+    pygame.display.flip()
+
 
 # Quit Pygame
 pygame.quit()
