@@ -1,7 +1,7 @@
 #
 
 import pygame as p
-from Chess import ChessEngine
+from chess import ChessEngine
 
 WIDTH = HEIGHT = 400
 DIMENSION = 8
@@ -50,5 +50,5 @@ def drawPieces(screen,board):
             if piece != "--":
                 screen.blit(IMAGES[piece], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
-
-main()
+if __name__ == "__main__":
+    main()
