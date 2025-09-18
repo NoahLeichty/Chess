@@ -1,9 +1,9 @@
 #
 
 import pygame as p
-from chess import ChessEngine
+import ChessEngine
 
-WIDTH = HEIGHT = 400
+WIDTH = HEIGHT = 700
 DIMENSION = 8
 SQ_SIZE = HEIGHT // DIMENSION
 MAX_FPS = 15
@@ -13,7 +13,7 @@ IMAGES = {}
 def loadimages():
     pieces = ['wP','wR', 'wN', 'wB', 'wK', 'wQ', 'bP', 'bR', 'bN', 'bB', 'bK', 'bQ']
     for piece in pieces:
-        IMAGES[piece] = p.transform.scale(p.image.load("Assets/" + piece + ".png")), (SQ_SIZE, SQ_SIZE)
+        IMAGES[piece] = p.transform.scale(p.image.load("Assets/" + piece + ".png"), (SQ_SIZE, SQ_SIZE))
 
 def main():
     p.init
