@@ -34,20 +34,42 @@ class GameState():
 
     # all moves not considering check
     def getAllPossibleMoves(self):
-        moves = [Move((6,4), (4,4), self.board)]
+        moves = []
         for r in range (len(self.board)):
             for c in range(len(self.board[r])):
                 turn = self.board[r][c][0]
-                if (turn == "w" and self.whiteToMove) and (turn == "b" and not self.whiteToMove):
+                if (turn == "w" and self.whiteToMove) or (turn == "b" and not self.whiteToMove):
                     piece = self.board[r][c][1]
-                    if piece == "p":
+                    if piece == "P":
                         self.getPawnMoves(r,c, moves)
                     elif piece == "R":
                         self.getRookMoves(r,c, moves)
         return moves
     
     def getPawnMoves(self, r, c, moves):
-        pass
+        if self.whiteToMove:
+            if self.board[r-1][c] == "--":
+                moves.append(Move((r,c), (r-1, c), self.board))
+                if r == 6 and self.board[r-2][c] == "--":
+                    moves.append(Move((r,c), (r-2, c), self.board))
+            if c-1 >= 0: # captures to the left
+                if self.board[r-1][c-1][0] == "b":
+                    moves.append(Move((r, c), (r-1,c-1), self.board))
+            if c+1 <= 7: # captures to the right
+                if self.board[r-1][c+1][0] == "b":
+                    moves.append(Move((r,c), (r-1, c+1), self.board))
+        else:
+            if self.board[r+1][c] == "--":
+                moves.append(Move((r,c), (r+1, c), self.board))
+                if r == 1 and self.board[r+2][c] == "--":
+                    moves.append(Move((r,c), (r+2, c), self.board))
+            if c-1 >= 0: # captures to the left
+                if self.board[r+1][c-1][0] == "w":
+                    moves.append(Move((r, c), (r+1,c-1), self.board))
+            if c+1 <= 7: # captures to the right
+                if self.board[r+1][c+1][0] == "w":
+                    moves.append(Move((r,c), (r+1, c+1), self.board))
+
 
     def getRookMoves(self, r, c, moves):
         pass
