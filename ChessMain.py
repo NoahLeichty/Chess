@@ -46,13 +46,24 @@ def main():
                 if len(playerClicks) == 2:
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                     print(move.getChessNotation())
-                    if move in validMoves:
+                    # Old move validation method
+                    """if move in validMoves:
                         gs.makeMove(move)
                         moveMade = True 
                         sqSelected = ()
                         playerClicks = []
                     else:
+                        playerClicks = [sqSelected]"""
+                    # Bugged so that when a certiain move order is made white moves multiple times
+                    for i in range(len(validMoves)):
+                            if move == validMoves[i]:
+                                gs.makeMove(validMoves[i])
+                                moveMade = True
+                                sqSelected = () # reset user clicks
+                                playerClicks = []
+                    if not moveMade:
                         playerClicks = [sqSelected]
+                            
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_LEFT:
                     gs.undoMove()
