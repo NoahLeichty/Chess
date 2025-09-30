@@ -463,15 +463,15 @@ class GameState():
         if move.pieceCaptured == 'wR':
             if move.endRow == 7:
                 if move.endCol == 0:
-                    self.currentCastlingRight.wqs = False
+                    self.whiteCastleQueenside = False
                 elif move.endCol == 7:
-                    self.currentCastlingRight.wks = False
+                    self.whiteCastleKingside = False
         elif move.pieceCaptured == 'bR':
             if move.endRow == 0:
                 if move.endCol == 0:
-                    self.currentCastlingRight.bqs = False
+                    self.blackCastleQueenside = False
                 elif move.endCol == 7:
-                    self.currentCastlingRight.bks = False
+                    self.blackCastleKingside = False
 
 class CastleRights():
     def __init__(self, wks, bks, wqs, bqs):
