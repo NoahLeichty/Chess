@@ -12,6 +12,16 @@ class GameState():
             ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"],
             ]
+        self.boardB = [
+            ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"],
+            ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
+            ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
+            ]
         
         self.moveFunctions = {"P":self.getPawnMoves, "R":self.getRookMoves, "N":self.getKnightMoves,
                               "B":self.getBishopMoves, "Q":self.getQueenMoves, "K": self.getKingMoves}
@@ -314,7 +324,7 @@ class GameState():
 
     def getKingMoves(self, r, c, moves):
         rowMoves = (-1, -1, -1, 0, 0, 1, 1, 1)
-        colMoves = (-1, 0, 1, -1, -1, -1, 0, 1)
+        colMoves = (-1, 0, 1, -1, 1, -1, 0, 1)
         allyColor = "w" if self.whiteToMove else "b"
         for i in range(8):
             endRow = r + rowMoves[i]
