@@ -2,9 +2,11 @@
 import ChessEngine
 
 class ChessBot:
-    def __init__(self, game_state):
-        self.game_state = game_state
+    def __init__(self, gameState):
+        self.game_state = gameState
 
-    def randomMove(self, valid_moves):
+    def randomMove(self, validMoves):
         import random
-        return random.choice(valid_moves)
+        if len(validMoves) != 0:
+            return random.choice(validMoves)
+        
