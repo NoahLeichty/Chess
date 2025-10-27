@@ -2,6 +2,7 @@
 
 import pygame as p
 import ChessEngine
+import ChessBot
 
 WIDTH = HEIGHT = 700
 DIMENSION = 8
@@ -22,6 +23,7 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = ChessEngine.GameState()
+    bot = ChessBot.ChessBot(gs)
     validMoves = gs.getValidMoves()
     moveMade = False # flag variable for when a move is made
     animate = False # flag variable for when we should animate a move
@@ -59,12 +61,18 @@ def main():
                             playerClicks = [sqSelected]"""
                         # Bugged so that when a certiain move order is made white moves multiple times
                         for i in range(len(validMoves)):
-                                if move == validMoves[i]:
-                                    gs.makeMove(validMoves[i])
-                                    moveMade = True
-                                    animate = True
-                                    sqSelected = () # reset user clicks
-                                    playerClicks = []
+                            if move == validMoves[i]:
+                                #makes user move
+                                gs.makeMove(validMoves[i])
+                                #makes bot move
+                                bot.game_state = gs # update bot's game state
+                                botMove = bot.randomMove(gs.getValidMoves())
+                                gs.makeMove(botMove)
+                                moveMade = True
+                                animate = True
+                                sqSelected = () # reset user clicks
+                                playerClicks = []
+                                
                         if not moveMade:
                             playerClicks = [sqSelected]
                             
