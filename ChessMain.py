@@ -68,7 +68,7 @@ def main():
                                 #need to improve this because it does not trigger checkmate/stalemate
                                 bot.gameState = gs # update bot's game state
                                 botMove = bot.randomMove(gs.getValidMoves())
-                                gs.makeMove(botMove[i])
+                                gs.makeMove(botMove)
                                 moveMade = True
                                 animate = True
                                 sqSelected = () # reset user clicks
