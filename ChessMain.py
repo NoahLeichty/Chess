@@ -182,5 +182,30 @@ def drawText(screen, text):
 def choice(screen, text):
     pass
 
+class Button:
+    def __init__(self, x, y, width, height, text, color, hover_color, action=None):
+        self.rect = p.Rect(x, y, width, height)
+        self.text = text
+        self.color = color
+        self.hover_color = hover_color
+        self.action = action
+        self.is_hovered = False
+
+    def draw(self, screen):
+        current_color = self.hover_color if self.is_hovered else self.color
+        p.draw.rect(screen, current_color, self.rect)
+        
+        font = p.font.SysFont("Arial", 30)
+        text_surface = font.render(self.text, True, (255, 255, 255)) # White text
+        text_rect = text_surface.get_rect(center=self.rect.center)
+        screen.blit(text_surface, text_rect)
+
+    def handle_event(self, event):
+        if event.type == p.MOUSEMOTION:
+            self.is_hovered = self.rect.collidepoint(event.pos)
+        if event.type == p.MOUSEBUTTONDOWN and event.button == 1:
+            if self.is_hovered and self.action:
+                self.action()
+
 if __name__ == "__main__":
     main()
