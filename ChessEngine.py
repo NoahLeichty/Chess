@@ -518,6 +518,9 @@ class Move():
 
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
 
+    def getPawnPromotion(self):
+        return self.isPawnPromotion
+
     def __eq__(self, other):
         if isinstance(other,Move):
             return self.moveID == other.moveID

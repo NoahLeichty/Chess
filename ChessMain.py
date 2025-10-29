@@ -3,6 +3,7 @@
 import pygame as p
 import ChessEngine
 import ChessBot
+import sys
 
 WIDTH = HEIGHT = 700
 DIMENSION = 8
@@ -33,12 +34,24 @@ def main():
     playerClicks = [] # keep track of player clicks
     gameOver = False
 
+    queenPromotion = p.image.load("assets/wq.png").convert_alpha()
+    queenPromotionRect = queenPromotion.get_rect(topleft=(250,250))  # Position the button
+    rookPromotion = p.image.load("assets/wr.png").convert_alpha()
+    rookPromotionRect = rookPromotion.get_rect(topleft=(350,250))  # Position the button
+    bishopPromotion = p.image.load("assets/wb.png").convert_alpha()
+    bishopPromotionRect = bishopPromotion.get_rect(topleft=(250,350))  # Position the button
+    knightPromotion = p.image.load("assets/wn.png").convert_alpha()
+    knightPromotionRect = knightPromotion.get_rect(topleft=(350,350))  # Position the button
+
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
                 if not gameOver:
+                    if queenPromotionRect.collidepoint(e.pos):
+                        print("Button clicked!")
+
                     location = p.mouse.get_pos() # location of mouse
                     col = location[0]//SQ_SIZE
                     row = location[1]//SQ_SIZE
@@ -97,6 +110,12 @@ def main():
             moveMade = False
 
         drawGameState(screen,gs, validMoves, sqSelected)
+
+        if ChessEngine.Move.getPawnPromotion == True:
+            screen.blit(queenPromotion, queenPromotionRect.topleft)  #Draw button
+            screen.blit(rookPromotion, rookPromotionRect.topleft)
+            screen.blit(bishopPromotion, bishopPromotionRect.topleft)
+            screen.blit(knightPromotion, knightPromotionRect.topleft)
 
         if gs.checkmate:
             gameOver = True
