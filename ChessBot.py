@@ -6,7 +6,15 @@ class ChessBot:
         self.game_state = gameState
 
     def randomMove(self, validMoves):
-        import random
+        from random import choice
         if len(validMoves) != 0:
-            return random.choice(validMoves)
+            return choice(validMoves)
+        
+    def pieceValue(self, piece):
+        values = {"wP": 1, "wN": 3, "wB": 3, "wR": 5, "wQ": 9,
+                  "bP": -1, "bN": -3, "bB": -3, "bR": -5, "bQ": -9}
+        return values.get(piece, 0)
+    
+    
+
         
