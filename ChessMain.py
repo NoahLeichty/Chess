@@ -80,7 +80,7 @@ def main():
                                 #makes bot move
                                 #need to improve this because it does not trigger checkmate/stalemate
                                 bot.gameState = gs # update bot's game state
-                                botMove = bot.randomMove(gs.getValidMoves())
+                                botMove = bot.bestMove(gs.getValidMoves())
                                 gs.makeMove(botMove)
                                 moveMade = True
                                 animate = True
@@ -111,11 +111,10 @@ def main():
 
         drawGameState(screen,gs, validMoves, sqSelected)
 
-        if ChessEngine.Move.getPawnPromotion == True:
-            screen.blit(queenPromotion, queenPromotionRect.topleft)  #Draw button
-            screen.blit(rookPromotion, rookPromotionRect.topleft)
-            screen.blit(bishopPromotion, bishopPromotionRect.topleft)
-            screen.blit(knightPromotion, knightPromotionRect.topleft)
+        #screen.blit(queenPromotion, queenPromotionRect.topleft)  #Draw button
+        #screen.blit(rookPromotion, rookPromotionRect.topleft)
+        #screen.blit(bishopPromotion, bishopPromotionRect.topleft)
+        #screen.blit(knightPromotion, knightPromotionRect.topleft)
 
         if gs.checkmate:
             gameOver = True
@@ -219,7 +218,7 @@ class Button:
         text_rect = text_surface.get_rect(center=self.rect.center)
         screen.blit(text_surface, text_rect)
 
-    def handle_event(self, event):
+    def handleEvent(self, event):
         if event.type == p.MOUSEMOTION:
             self.is_hovered = self.rect.collidepoint(event.pos)
         if event.type == p.MOUSEBUTTONDOWN and event.button == 1:
