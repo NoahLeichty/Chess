@@ -77,15 +77,16 @@ def main():
                             if move == validMoves[i]:
                                 #makes user move
                                 gs.makeMove(validMoves[i])
-                                #makes bot move
-                                #need to improve this because it does not trigger checkmate/stalemate
-                                bot.gameState = gs # update bot's game state
-                                botMove = bot.bestMove(gs.getValidMoves())
-                                gs.makeMove(botMove)
                                 moveMade = True
                                 animate = True
                                 sqSelected = () # reset user clicks
                                 playerClicks = []
+                                #makes bot move
+                                #need to improve this because it does not trigger checkmate/stalemate
+                                bot.gameState = gs # update bot's game state
+                                botMove = bot.randomMove(gs.getValidMoves())
+                                gs.makeMove(botMove)
+                                
                                 
                         if not moveMade:
                             playerClicks = [sqSelected]
