@@ -87,7 +87,6 @@ def main():
                                 botMove = bot.randomMove(gs.getValidMoves())
                                 gs.makeMove(botMove)
                                 
-                                
                         if not moveMade:
                             playerClicks = [sqSelected]
                             

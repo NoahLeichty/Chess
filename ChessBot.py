@@ -1,5 +1,6 @@
 #will be logic for a chess bot to make moves
 import ChessEngine
+import my_module
 
 class ChessBot:
     def __init__(self, gameState):
@@ -17,4 +18,13 @@ class ChessBot:
     
     def evaluateBoard(self):
         evaluation = 0
+        for piece in self.gameState.board:
+            evaluation += self.pieceValue(piece)
+        return evaluation
+    
+    def minMax(self, node, depth, maximizingPlayer):
+        if depth == 0:
+            return node
+    
+
         
