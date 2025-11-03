@@ -18,9 +18,7 @@ class ChessBot:
     
     def evaluateBoard(self):
         evaluation = 0
-        for piece in self.gameState.board:
-            evaluation += self.pieceValue(piece)
-        return evaluation
+        
     
     def minMax(self, node, depth, maximizingPlayer):
         if depth == 0:
