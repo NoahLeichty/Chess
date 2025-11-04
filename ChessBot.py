@@ -11,18 +11,15 @@ class ChessBot:
         if len(validMoves) != 0:
             return choice(validMoves)
     
-    def pieceValue(self, piece):
-        values = {"wP": 1, "wN": 3, "wB": 3, "wR": 5, "wQ": 9, "wK": 0,
-                  "bP": -1, "bN": -3, "bB": -3, "bR": -5, "bQ": -9, "bK": 0, "--": 0}
-        return values.get(piece, 0)
-    
     def evaluateBoard(self):
+        #simple evaluation function that counts material
+        board = self.gameState.board
+        pieceValues = {
+            'wP': 1, 'wN': 3, 'wB': 3, 'wR': 5, 'wQ': 9, 'wK': 0,
+            'bP': -1, 'bN': -3, 'bB': -3, 'bR': -5, 'bQ': -9, 'bK': 0
+        }
         evaluation = 0
-        
     
     def minMax(self, node, depth, maximizingPlayer):
         if depth == 0:
             return node
-    
-
-        
