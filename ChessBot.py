@@ -86,6 +86,22 @@ class ChessBot:
             self.gameState.undoMove()
         return maxEval
     
+    def alphaBeta(self, alpha, beta, depth):
+        if depth == 0:
+            return self.simpleBoardEvaluation()
+        maxEval = -float('inf')
+        for move in self.gameState.getValidMoves():
+            self.gameState.makeMove(move)
+            eval = -self.alphaBeta(-beta, -alpha, depth - 1)
+            self.gameState.undoMove()
+            if eval > maxEval:
+                maxEval = eval
+            if maxEval > alpha:
+                alpha = maxEval
+            if beta <= alpha:
+                return maxEval
+        return maxEval
+
     def makeBestMove(self, validMoves, depth):
         bestMove = None
         maxEval = -float('inf')
