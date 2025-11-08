@@ -11,6 +11,8 @@ class ChessBot:
         if len(validMoves) != 0:
             return choice(validMoves)
     
+    def pawnEvaluation(self):
+        pass
     def evaluateBoard(self):
         #simple evaluation function that counts material
         board = self.gameState.board
@@ -41,7 +43,7 @@ class ChessBot:
         # Another way to do board evaluation
         evaluation = 0
         material = 0
-        mobility = len(self.gameState.getValidMoves())
+        mobility = len(ChessEngine.GameState().getValidMoves())
         KingSafety = 0 
         CenterControl = 0
         PawnStructure = 0
@@ -78,22 +80,22 @@ class ChessBot:
         if depth == 0:
             return self.simpleBoardEvaluation()
         maxEval = -float('inf')
-        for move in self.gameState.getValidMoves():
-            self.gameState.makeMove(move)
+        for move in ChessEngine.GameState().getValidMoves():
+            ChessEngine.GameState().makeMove(move)
             eval = -self.negaMax(depth - 1)
             if eval > maxEval:
                 maxEval = eval
-            self.gameState.undoMove()
+            ChessEngine.GameState().undoMove()
         return maxEval
     
     def alphaBeta(self, alpha, beta, depth):
         if depth == 0:
             return self.simpleBoardEvaluation()
         maxEval = -float('inf')
-        for move in self.gameState.getValidMoves():
-            self.gameState.makeMove(move)
+        for move in ChessEngine.GameState().getValidMoves():
+            ChessEngine.GameState()(move)
             eval = -self.alphaBeta(-beta, -alpha, depth - 1)
-            self.gameState.undoMove()
+            ChessEngine.GameState().undoMove()
             if eval > maxEval:
                 maxEval = eval
             if maxEval > alpha:
@@ -106,9 +108,9 @@ class ChessBot:
         bestMove = None
         maxEval = -float('inf')
         for move in validMoves:
-            self.gameState.makeMove(move)
+            ChessEngine.GameState().makeMove(move)
             eval = -self.negaMax(depth - 1)
-            self.gameState.undoMove()
+            ChessEngine.GameState().undoMove()
             if eval > maxEval:
                 maxEval = eval
                 bestMove = move
