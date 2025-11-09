@@ -33,7 +33,7 @@ class ChessBot:
 
         mobilityScore = mobilityWt * (wMobility-bMobility)
 
-        if self.gameState.whiteToMove:
+        if ChessEngine.GameState().whiteToMove:
             sideToMove = 1
         else:
             sideToMove = -1
