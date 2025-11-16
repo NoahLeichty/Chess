@@ -82,9 +82,9 @@ class ChessBot:
         for move in self.gameState.getValidMoves():
             self.gameState.makeMove(move)
             eval = -self.negaMax(depth - 1)
-            self.gameState.undoMove()
             if eval < maxEval:
                 maxEval = eval
+            self.gameState.undoMove()
         return maxEval
     
     def alphaBeta(self, alpha, beta, depth):
@@ -109,10 +109,10 @@ class ChessBot:
         for move in validMoves:
             self.gameState.makeMove(move)
             eval = -self.negaMax(depth - 1) #get rid of negative sign to have it work like findBestMove
-            self.gameState.undoMove()
             if eval < maxEval:
                 maxEval = eval
                 bestMove = move
+            self.gameState.undoMove()
         return bestMove
     
     #This greedy algorithm works
