@@ -75,16 +75,16 @@ class ChessBot:
         if depth == 0:
             return node
     
-    def negaMax(self, depth):
-        if depth == 0:
-            return self.simpleBoardEvaluation()
-        maxEval = float('inf')
+    def negaMax(self, depth,color):
+        if depth == 0:    
+            return  color * self.simpleBoardEvaluation()
+        maxEval = -float('inf')
         for move in self.gameState.getValidMoves():
             self.gameState.makeMove(move)
-            eval = -self.negaMax(depth - 1)
-            if eval < maxEval:
-                maxEval = eval
+            eval = -self.negaMax(depth - 1,-color)
             self.gameState.undoMove()
+            if eval > maxEval:
+                maxEval = eval
         return maxEval
     
     def alphaBeta(self, alpha, beta, depth):
@@ -105,14 +105,14 @@ class ChessBot:
 
     def makeBestMove(self, validMoves, depth):
         bestMove = None
-        maxEval = float('inf')
+        maxEval = -float('inf')
         for move in validMoves:
             self.gameState.makeMove(move)
-            eval = -self.negaMax(depth - 1) #get rid of negative sign to have it work like findBestMove
-            if eval < maxEval:
+            eval = -self.negaMax(depth - 1,1) #get rid of negative sign to have it work like findBestMove
+            self.gameState.undoMove()
+            if eval > maxEval:
                 maxEval = eval
                 bestMove = move
-            self.gameState.undoMove()
         return bestMove
     
     #This greedy algorithm works
