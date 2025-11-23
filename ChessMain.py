@@ -84,7 +84,7 @@ def main():
                                 #makes bot move
                                 #need to improve this because it does not trigger checkmate/stalemate
                                 bot.gameState = gs # update bot's game state
-                                botMove = bot.makeBestMove(gs.getValidMoves(), 3)
+                                botMove = bot.makeBestMove(gs.getValidMoves(), 4)
                                 gs.makeMove(botMove)
                                 
                         if not moveMade:

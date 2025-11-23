@@ -75,6 +75,7 @@ class ChessBot:
         if depth == 0:
             return node
     
+    # Minimax algorithm with negamax simplification
     def negaMax(self, depth,color):
         if depth == 0:    
             return  color * self.simpleBoardEvaluation()
@@ -87,28 +88,30 @@ class ChessBot:
                 maxEval = eval
         return maxEval
     
-    def alphaBeta(self, alpha, beta, depth):
+    # Alpha-Beta pruning implementation
+    def alphaBeta(self, alpha, beta, depth, color):
         if depth == 0:
-            return self.simpleBoardEvaluation()
+            return color * self.simpleBoardEvaluation()
         maxEval = -float('inf')
         for move in self.gameState.getValidMoves():
-            self.gameState(move)
-            eval = -self.alphaBeta(-beta, -alpha, depth - 1)
+            self.gameState.makeMove(move)
+            eval = -self.alphaBeta(-beta, -alpha, depth - 1, -color)
             self.gameState.undoMove()
             if eval > maxEval:
                 maxEval = eval
-            if maxEval > alpha:
-                alpha = maxEval
-            if beta >= alpha:
+                if eval > alpha:
+                    alpha = eval
+            if eval >= beta:
                 return maxEval
         return maxEval
 
+    # Choose the best move using negamax
     def makeBestMove(self, validMoves, depth):
         bestMove = None
         maxEval = -float('inf')
         for move in validMoves:
             self.gameState.makeMove(move)
-            eval = -self.negaMax(depth - 1,1) #get rid of negative sign to have it work like findBestMove
+            eval = -self.alphaBeta(-float('inf'), float('inf'), depth - 1,1)
             self.gameState.undoMove()
             if eval > maxEval:
                 maxEval = eval
