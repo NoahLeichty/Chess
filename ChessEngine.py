@@ -57,7 +57,7 @@ class GameState():
         
         # pawn promotion
         if move.isPawnPromotion:
-            promotedPiece = input("Q, R, B, N? ") # default to queen
+            promotedPiece = "Q" # default to queen
             # Here add logic to choose different pieces
             self.board[move.endRow][move.endCol] = move.pieceMoved[0] + promotedPiece
 

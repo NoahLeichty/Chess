@@ -43,6 +43,11 @@ def main():
     knightPromotion = p.image.load("assets/wn.png").convert_alpha()
     knightPromotionRect = knightPromotion.get_rect(topleft=(350,350))  # Position the button
 
+    playWhite = Button(10, 10, 150, 50, "Play White", p.Color('Black'), p.Color('light green'), )
+    playBlack = Button(200, 10, 150, 50, "Play Black", p.Color('Black'), p.Color('light green'), )
+    #playWhite.draw(screen)
+    #playBlack.draw(screen)
+
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
@@ -84,7 +89,7 @@ def main():
                                 #makes bot move
                                 #need to improve this because it does not trigger checkmate/stalemate
                                 bot.gameState = gs # update bot's game state
-                                botMove = bot.makeBestMove(gs.getValidMoves(), 4)
+                                botMove = bot.makeBestMove(gs.getValidMoves(), 3)
                                 gs.makeMove(botMove)
                                 
                         if not moveMade:
@@ -108,8 +113,8 @@ def main():
                 animateMove(gs.moveLog[-1], screen, gs.board, clock)
             validMoves = gs.getValidMoves()
             moveMade = False
-
-        drawGameState(screen,gs, validMoves, sqSelected)
+        
+        drawGameStateWhite(screen, gs, validMoves, sqSelected)
 
         #screen.blit(queenPromotion, queenPromotionRect.topleft)  #Draw button
         #screen.blit(rookPromotion, rookPromotionRect.topleft)
@@ -146,10 +151,15 @@ def highlightSquares(screen, gs, validMoves, sqSelected):
                     screen.blit(s, (move.endCol*SQ_SIZE, move.endRow*SQ_SIZE))
 
 # Draws the squares on the board and pieces
-def drawGameState(screen,gs, validMoves, sqSelected):
+def drawGameStateWhite(screen,gs, validMoves, sqSelected):
     drawBoard(screen)
     highlightSquares(screen, gs, validMoves, sqSelected)
     drawPieces(screen,gs.board)
+
+def drawGameStateBlack(screen,gs, validMoves, sqSelected):
+    drawBoard(screen)
+    highlightSquares(screen, gs, validMoves, sqSelected)
+    drawPieces(screen,gs.boardB)
 
 def drawBoard(screen):
     global colors
