@@ -43,21 +43,16 @@ class ChessBot:
         # Another way to do board evaluation
         evaluation = 0
         mobility = len(self.gameState.getValidMoves())
-        KingSafety = 0  
+        KingSafety = 0
         CenterControl = 0
-        if board[3][3] in ['bP','bN','bB','bR','bQ'] or board[3][4] in ['bP','bN','bB','bR','bQ'] or board[4][3] in ['bP','bN','bB','bR','bQ'] or board[4][4] in ['bP','bN','bB','bR','bQ']:
-            CenterControl += 5
+        if board[3][3] in ['bN','bB','bR','bQ'] or board[3][4] in ['bN','bB','bR','bQ'] or board[4][3] in ['bN','bB','bR','bQ'] or board[4][4] in ['bN','bB','bR','bQ']:
+            CenterControl += -1
+        if board[3][3] in ['bP'] or board[3][4] in ['bP'] or board[4][3] in ['bP'] or board[4][4] in ['bP']:
+            CenterControl += -3
         PawnStructure = 0
         pieceActivity = 0
-        pieceValues = {
-            'wP': 1, 'wN': 3, 'wB': 3, 'wR': 5, 'wQ': 9, 'wK': 100,
-            'bP': -1, 'bN': -3, 'bB': -3, 'bR': -5, 'bQ': -9, 'bK':100
-        }
-        for row in board:
-            for piece in row:
-                if piece in pieceValues:
-                    evaluation += pieceValues[piece]
-        return evaluation + (mobility * 0.01) + CenterControl + (KingSafety * 0.05) + (PawnStructure * 0.03) + (pieceActivity * 0.02)
+        evaluation += self.simpleBoardEvaluation()
+        return evaluation + (mobility * 0.001) + (CenterControl * 0.1) + (KingSafety * 0.05) + (PawnStructure * 0.03) + (pieceActivity * 0.02)
     
     # A simpler board evaluation function that focuses solely on material count
     def simpleBoardEvaluation(self):
@@ -67,10 +62,9 @@ class ChessBot:
             'bP': -1, 'bN': -3, 'bB': -3, 'bR': -5, 'bQ': -9, 'bK':100
         }
         evaluation = 0
-        for row in board:
-            for piece in row:
-                if piece in pieceValues:
-                    evaluation += pieceValues[piece]
+        for piece in pieceValues:
+            for row in board:
+                evaluation += row.count(piece) * pieceValues[piece]
         return evaluation
         
     def minMax(self, node, depth, maximizingPlayer):
@@ -80,7 +74,7 @@ class ChessBot:
     # Minimax algorithm with negamax simplification
     def negaMax(self, depth,color):
         if depth == 0:    
-            return  color * self.simpleBoardEvaluation()
+            return  color * self.evaluateBoard()
         maxEval = -float('inf')
         for move in self.gameState.getValidMoves():
             self.gameState.makeMove(move)
