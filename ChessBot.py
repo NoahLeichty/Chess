@@ -58,9 +58,9 @@ class ChessBot:
     def simpleBoardEvaluation(self):
         board = self.gameState.board
         pieceValues = {
-            'wP': 1, 'wN': 3, 'wB': 3, 'wR': 5, 'wQ': 9, 'wK': 100,
-            'bP': -1, 'bN': -3, 'bB': -3, 'bR': -5, 'bQ': -9, 'bK':100
-        }
+            'wP': 100, 'wN': 300, 'wB': 300, 'wR': 500, 'wQ': 900, 'wK': 10000,
+            'bP': -100, 'bN': -300, 'bB': -300, 'bR': -500, 'bQ': -900, 'bK':10000
+            }
         evaluation = 0
         for piece in pieceValues:
             for row in board:
@@ -87,8 +87,10 @@ class ChessBot:
     # Alpha-Beta pruning implementation
     def alphaBeta(self, alpha, beta, depth, color):
         if depth == 0:
-            return color * self.evaluateBoard()
+            return color * self.quiescenceSearch(alpha, beta, color)
         maxEval = -float('inf')
+        if self.gameState.checkmate:
+            return -float('inf')
         for move in self.gameState.getValidMoves():
             self.gameState.makeMove(move)
             eval = -self.alphaBeta(-beta, -alpha, depth - 1, -color)
@@ -98,8 +100,34 @@ class ChessBot:
                 if eval > alpha:
                     alpha = eval
             if eval >= beta:
-                return maxEval
+                return beta
         return maxEval
+    
+    # Quiescence Search that extends the search for "quiet" positions
+    def quiescenceSearch(self, alpha, beta, color):
+        stand_pat = color * self.evaluateBoard()
+        if stand_pat >= beta:
+            return beta
+        if alpha < stand_pat:
+            alpha = stand_pat
+        for move in self.gameState.getValidMoves():
+            if move.pieceCaptured != '--':  # Only consider captures
+                self.gameState.makeMove(move)
+                score = -self.quiescenceSearch(-beta, -alpha, -color)
+                self.gameState.undoMove()
+                if score >= beta:
+                    return beta
+                if score > alpha:
+                    alpha = score
+        return alpha
+    
+    def moveOrdering(self, moves):
+        # Simple move ordering based on captures
+        def moveValue(move):
+            if move.pieceCaptured != '--':
+                return 10 + self.getPieceValue(move.pieceCaptured)
+            return 0
+        return sorted(moves, key=moveValue, reverse=True)
 
     # Choose the best move using negamax
     def makeBestMove(self, validMoves, depth):
