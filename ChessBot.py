@@ -87,7 +87,7 @@ class ChessBot:
     # Alpha-Beta pruning implementation
     def alphaBeta(self, alpha, beta, depth, color):
         if depth == 0:
-            return color * self.quiescenceSearch(alpha, beta, color)
+            return color * self.evaluateBoard()
         maxEval = -float('inf')
         if self.gameState.checkmate:
             return -float('inf')
@@ -125,7 +125,9 @@ class ChessBot:
         # Simple move ordering based on captures
         def moveValue(move):
             if move.pieceCaptured != '--':
-                return 10 + self.getPieceValue(move.pieceCaptured)
+                return 10 + self.getPieceValue(move.pieceCaptured) - self.getPieceValue(move.pieceMoved)
+            if move.isPromotion:
+                return 8
             return 0
         return sorted(moves, key=moveValue, reverse=True)
 
@@ -135,7 +137,7 @@ class ChessBot:
         maxEval = -float('inf')
         for move in validMoves:
             self.gameState.makeMove(move)
-            eval = -self.alphaBeta(-float('inf'), float('inf'), depth - 1,1)
+            eval = -self.quiescenceSearch(-float('inf'), float('inf'), 1)
             self.gameState.undoMove()
             if eval > maxEval:
                 maxEval = eval
