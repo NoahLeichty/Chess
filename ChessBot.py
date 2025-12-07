@@ -12,7 +12,17 @@ class ChessBot:
             return choice(validMoves)
     
     def pawnEvaluation(self):
-        pass
+        pawnEvalutaion = [[2, 2, 2, 2, 2, 2, 2, 2],
+                          [2, 2, 2, 2, 2, 2, 2, 2],
+                          [1.75, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.75],
+                          [1.5, 1.25, 1.75, 1.75, 1, 1, 1.25, 1.5],
+                          [1.25, 1, 1, 1.5, 1.5, 1, 1, 1.25],
+                          [1.25, 1.1, 1.1, 0.95, 0.95, 1.1, 1.1, 1.25],
+                          [.95, .95, .95, .95, .95, .95, .95, .95],
+                          [0, 0, 0, 0, 0, 0, 0, 0],
+                          ]
+        return pawnEvalutaion
+
     def evaluateBoard(self):
         #simple evaluation function that counts material
         board = self.gameState.board
@@ -46,20 +56,22 @@ class ChessBot:
         KingSafety = 0
         CenterControl = 0
         if board[3][3] in ['bN','bB','bR','bQ'] or board[3][4] in ['bN','bB','bR','bQ'] or board[4][3] in ['bN','bB','bR','bQ'] or board[4][4] in ['bN','bB','bR','bQ']:
-            CenterControl += -1
+            CenterControl += 3
         if board[3][3] in ['bP'] or board[3][4] in ['bP'] or board[4][3] in ['bP'] or board[4][4] in ['bP']:
-            CenterControl += -3
+            CenterControl += 100
+        if board[0][6] == 'bK' or board[0][3] == 'bk':
+            KingSafety += 10
         PawnStructure = 0
         pieceActivity = 0
-        evaluation += self.simpleBoardEvaluation()
-        return evaluation + (mobility * 0.001) + (CenterControl * 0.1) + (KingSafety * 0.05) + (PawnStructure * 0.03) + (pieceActivity * 0.02)
+        evaluation = self.simpleBoardEvaluation()
+        return evaluation + (mobility * 0.1) + (CenterControl) + (KingSafety) + (PawnStructure * 0.03) + (pieceActivity * 0.02)
     
     # A simpler board evaluation function that focuses solely on material count
     def simpleBoardEvaluation(self):
         board = self.gameState.board
         pieceValues = {
-            'wP': 100, 'wN': 300, 'wB': 300, 'wR': 500, 'wQ': 900, 'wK': 10000,
-            'bP': -100, 'bN': -300, 'bB': -300, 'bR': -500, 'bQ': -900, 'bK':10000
+            'wP': 1, 'wN': 3, 'wB': 3, 'wR': 5, 'wQ': 9, 'wK': 1000,
+            'bP': -1, 'bN': -3, 'bB': -3, 'bR': -5, 'bQ': -9, 'bK':1000
             }
         evaluation = 0
         for piece in pieceValues:
@@ -104,7 +116,7 @@ class ChessBot:
         return maxEval
     
     # Quiescence Search that extends the search for "quiet" positions
-    def quiescenceSearch(self, alpha, beta, color):
+    def quiescenceSearch(self, alpha, beta, depth, color,):
         stand_pat = color * self.evaluateBoard()
         if stand_pat >= beta:
             return beta
@@ -113,7 +125,7 @@ class ChessBot:
         for move in self.gameState.getValidMoves():
             if move.pieceCaptured != '--':  # Only consider captures
                 self.gameState.makeMove(move)
-                score = -self.quiescenceSearch(-beta, -alpha, -color)
+                score = -self.quiescenceSearch(-beta, -alpha, depth -1, -color)
                 self.gameState.undoMove()
                 if score >= beta:
                     return beta
@@ -121,23 +133,19 @@ class ChessBot:
                     alpha = score
         return alpha
     
-    def moveOrdering(self, moves):
+    def moveOrdering(self):
         # Simple move ordering based on captures
-        def moveValue(move):
-            if move.pieceCaptured != '--':
-                return 10 + self.getPieceValue(move.pieceCaptured) - self.getPieceValue(move.pieceMoved)
-            if move.isPromotion:
-                return 8
-            return 0
-        return sorted(moves, key=moveValue, reverse=True)
-
+        for move in self.gameState.getValidMoves():
+            moveScore = 0
+        return moveScore
+        
     # Choose the best move using negamax
     def makeBestMove(self, validMoves, depth):
         bestMove = None
         maxEval = -float('inf')
         for move in validMoves:
             self.gameState.makeMove(move)
-            eval = -self.quiescenceSearch(-float('inf'), float('inf'), 1)
+            eval = -self.alphaBeta(-float('inf'), float('inf'), depth - 1, 1)
             self.gameState.undoMove()
             if eval > maxEval:
                 maxEval = eval
