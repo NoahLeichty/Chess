@@ -147,7 +147,7 @@ class ChessBot:
         maxEval = -float('inf')
         for move in validMoves:
             self.gameState.makeMove(move)
-            eval = -self.alphaBeta(-float('inf'), float('inf'), depth - 1, 1)
+            eval = -self.alphaBeta(-float('inf'), float('inf'), depth - 1, -1)
             self.gameState.undoMove()
             if eval > maxEval:
                 maxEval = eval
