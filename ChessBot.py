@@ -52,6 +52,7 @@ class ChessBot:
 
         # Another way to do board evaluation
         pieceEvaluation = 0
+        totalEvaluation = 0
         mobility = len(self.gameState.getValidMoves())
         KingSafety = 0
         CenterControl = 0
@@ -61,25 +62,44 @@ class ChessBot:
         if board[3][3] == ['wP'] or board[3][4] == ['wP'] or board[4][3] == ['wP'] or board[4][4] == ['wP']:
             CenterControl += 1000
         if board[3][3] == ['bK'] or board[3][4] == ['bK'] or board[4][3] == ['bK'] or board[4][4] == ['bK']:
-            KingSafety += 1
+            KingSafety = 1
         PawnStructure = 0
         pieceActivity = 0
         pieceEvaluation += self.simpleBoardEvaluation()
-        totalEvaluation = pieceEvaluation + (CenterControl * 0.01) + (KingSafety * 0.02) + (PawnStructure * 0.03) + (pieceActivity * 0.02)
-        return pieceEvaluation
+        totalEvaluation += pieceEvaluation + (CenterControl) + (KingSafety * 0.02) + (PawnStructure * 0.03) + (pieceActivity * 0.02)
+        return totalEvaluation
     
     # A simpler board evaluation function that focuses solely on material count
     def simpleBoardEvaluation(self):
         board = self.gameState.board
-        pieceValues = {
-            'wP': 1, 'wN': 3, 'wB': 3, 'wR': 5, 'wQ': 9, 'wK': 100,
-            'bP': -1, 'bN': -3, 'bB': -3, 'bR': -5, 'bQ': -9, 'bK':-100
-            }
-        evaluation = 0
-        for piece in pieceValues:
-            for row in board:
-                evaluation += row.count(piece) + pieceValues[piece]
-        return evaluation
+        pieceEvaluation = 0
+        for row in board:
+            for square in row:
+                if square == 'wP':
+                    pieceEvaluation += 1
+                elif square == 'bP':
+                    pieceEvaluation -= 1
+                elif square == 'wN':
+                    pieceEvaluation += 3
+                elif square == 'bN':
+                    pieceEvaluation -= 3
+                elif square == 'wB':
+                    pieceEvaluation += 3
+                elif square == 'bB':
+                    pieceEvaluation -= 3
+                elif square == 'wR':
+                    pieceEvaluation += 5
+                elif square == 'bR':
+                    pieceEvaluation -= 5
+                elif square == 'wQ':
+                    pieceEvaluation += 9
+                elif square == 'bQ':
+                    pieceEvaluation -= 9
+                elif square == 'wK':
+                    pieceEvaluation += 1000
+                elif square == 'bK':
+                    pieceEvaluation -= 1000
+        return pieceEvaluation
         
     def minMax(self, node, depth, maximizingPlayer):
         if depth == 0:
