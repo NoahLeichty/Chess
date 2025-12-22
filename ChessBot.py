@@ -51,27 +51,29 @@ class ChessBot:
         Eval  = (materialScore + mobilityScore) * sideToMove
 
         # Another way to do board evaluation
-        evaluation = 0
+        pieceEvaluation = 0
         mobility = len(self.gameState.getValidMoves())
         KingSafety = 0
         CenterControl = 0
-        if board[3][3] in ['wN','wB','wR','wQ'] or board[3][4] in ['wN','wB','wR','wQ'] or board[4][3] in ['wN','wB','wR','wQ'] or board[4][4] in ['wN','wB','wR','wQ']:
-            CenterControl += 3.5
+        
+        if board[4][3] == ['bP']:
+            CenterControl += -10000
         if board[3][3] == ['wP'] or board[3][4] == ['wP'] or board[4][3] == ['wP'] or board[4][4] == ['wP']:
-            CenterControl += 100
-        if board[0][6] == 'bK' or board[0][3] == 'bK':
+            CenterControl += 1000
+        if board[3][3] == ['bK'] or board[3][4] == ['bK'] or board[4][3] == ['bK'] or board[4][4] == ['bK']:
             KingSafety += 1
         PawnStructure = 0
         pieceActivity = 0
-        evaluation += self.simpleBoardEvaluation()
-        return evaluation + (CenterControl) + (KingSafety) + (PawnStructure * 0.03) + (pieceActivity * 0.02)
+        pieceEvaluation += self.simpleBoardEvaluation()
+        totalEvaluation = pieceEvaluation + (CenterControl * 0.01) + (KingSafety * 0.02) + (PawnStructure * 0.03) + (pieceActivity * 0.02)
+        return pieceEvaluation
     
     # A simpler board evaluation function that focuses solely on material count
     def simpleBoardEvaluation(self):
         board = self.gameState.board
         pieceValues = {
-            'wP': 1, 'wN': 3, 'wB': 3, 'wR': 5, 'wQ': 9, 'wK': 10,
-            'bP': -1, 'bN': -3, 'bB': -3, 'bR': -5, 'bQ': -9, 'bK':10
+            'wP': 1, 'wN': 3, 'wB': 3, 'wR': 5, 'wQ': 9, 'wK': 100,
+            'bP': -1, 'bN': -3, 'bB': -3, 'bR': -5, 'bQ': -9, 'bK':-100
             }
         evaluation = 0
         for piece in pieceValues:
@@ -97,15 +99,15 @@ class ChessBot:
         return maxEval
     
     # Alpha-Beta pruning implementation
-    def alphaBeta(self, alpha, beta, depth, color):
+    def alphaBeta(self, alpha, beta, depth):
         if depth == 0:
-            return color * self.evaluateBoard()
+            return self.evaluateBoard()
         maxEval = -float('inf')
         if self.gameState.checkmate:
             return -float('inf')
         for move in self.gameState.getValidMoves():
             self.gameState.makeMove(move)
-            eval = -self.alphaBeta(-beta, -alpha, depth - 1, -color)
+            eval = -self.alphaBeta(-beta, -alpha, depth - 1)
             self.gameState.undoMove()
             if eval > maxEval:
                 maxEval = eval
@@ -147,7 +149,7 @@ class ChessBot:
         maxEval = -float('inf')
         for move in validMoves:
             self.gameState.makeMove(move)
-            eval = -self.alphaBeta(-float('inf'), float('inf'), depth - 1, -1)
+            eval = -self.alphaBeta(-float('inf'), float('inf'), depth - 1)
             self.gameState.undoMove()
             if eval > maxEval:
                 maxEval = eval
