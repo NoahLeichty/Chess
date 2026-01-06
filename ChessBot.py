@@ -57,17 +57,16 @@ class ChessBot:
         KingSafety = 0
         CenterControl = 0
         
-        if board[4][3] == ['bP']:
-            CenterControl += -10000
-        if board[3][3] == ['wP'] or board[3][4] == ['wP'] or board[4][3] == ['wP'] or board[4][4] == ['wP']:
-            CenterControl += 1000
-        if board[3][3] == ['bK'] or board[3][4] == ['bK'] or board[4][3] == ['bK'] or board[4][4] == ['bK']:
-            KingSafety = 1
+        if board[3][3] in ['bN','bB','bR','bQ'] or board[3][4] in ['bN','bB','bR','bQ'] or board[4][3] in ['bN','bB','bR','bQ'] or board[4][4] in ['bN','bB','bR','bQ']:
+            CenterControl += 3
+        if board[3][3] in ['bP'] or board[3][4] in ['bP'] or board[4][3] in ['bP'] or board[4][4] in ['bP']:
+            CenterControl += 100
+        if board[0][6] == 'bK' or board[0][3] == 'bk':
+            KingSafety += 10
         PawnStructure = 0
         pieceActivity = 0
-        pieceEvaluation += self.simpleBoardEvaluation()
-        totalEvaluation += pieceEvaluation + (CenterControl) + (KingSafety * 0.02) + (PawnStructure * 0.03) + (pieceActivity * 0.02)
-        return totalEvaluation
+        evaluation = self.simpleBoardEvaluation()
+        return evaluation + (mobility * 0.1) + (CenterControl) + (KingSafety) + (PawnStructure * 0.03) + (pieceActivity * 0.02)
     
     # A simpler board evaluation function that focuses solely on material count
     def simpleBoardEvaluation(self):
