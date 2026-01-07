@@ -24,33 +24,9 @@ class ChessBot:
         return pawnEvalutaion
 
     def evaluateBoard(self):
-        #simple evaluation function that counts material
+        # An advanced board evaluation function considering multiple factors
         board = self.gameState.board
         
-        # One way to do board evaluation
-        kingWt = 1000
-        queenWt = 9
-        rookWt = 5
-        knightWt = 3
-        bishopWt = 3
-        pawnWt = 1
-        mobilityWt = 0.1
-        
-        wK = wQ = wR = wN = wB = wP = 0
-        bK = bQ = bR = bN = bB = bP = 0
-        wMobility = bMobility = 0
-        materialScore = kingWt  * (wK-bK) + queenWt * (wQ-bQ) + rookWt  * (wR-bR) + knightWt* (wN-bN) + bishopWt* (wB-bB) + pawnWt  * (wP-bP)
-
-        mobilityScore = mobilityWt * (wMobility-bMobility)
-
-        if ChessEngine.GameState().whiteToMove:
-            sideToMove = 1
-        else:
-            sideToMove = -1
-
-        Eval  = (materialScore + mobilityScore) * sideToMove
-
-        # Another way to do board evaluation
         pieceEvaluation = 0
         totalEvaluation = 0
         mobility = len(self.gameState.getValidMoves())
@@ -58,13 +34,18 @@ class ChessBot:
         CenterControl = 0
         
         if board[3][3] in ['bN','bB','bR','bQ'] or board[3][4] in ['bN','bB','bR','bQ'] or board[4][3] in ['bN','bB','bR','bQ'] or board[4][4] in ['bN','bB','bR','bQ']:
-            CenterControl += 3
+            CenterControl += -0.2
         if board[3][3] in ['bP'] or board[3][4] in ['bP'] or board[4][3] in ['bP'] or board[4][4] in ['bP']:
-            CenterControl += 100
+            CenterControl += -1
         if board[0][6] == 'bK' or board[0][3] == 'bk':
-            KingSafety += 10
+            KingSafety += -3
         PawnStructure = 0
         pieceActivity = 0
+
+        if self.gameState.moveLog:
+            lastMove = self.gameState.moveLog[-1]
+            pass
+
         evaluation = self.simpleBoardEvaluation()
         return evaluation + (mobility * 0.1) + (CenterControl) + (KingSafety) + (PawnStructure * 0.03) + (pieceActivity * 0.02)
     
