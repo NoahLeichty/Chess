@@ -34,11 +34,11 @@ class ChessBot:
         CenterControl = 0
         
         if board[3][3] in ['bN','bB','bR','bQ'] or board[3][4] in ['bN','bB','bR','bQ'] or board[4][3] in ['bN','bB','bR','bQ'] or board[4][4] in ['bN','bB','bR','bQ']:
-            CenterControl += -0.2
+            CenterControl += -0.1
         if board[3][3] in ['bP'] or board[3][4] in ['bP'] or board[4][3] in ['bP'] or board[4][4] in ['bP']:
             CenterControl += -1
         if board[0][6] == 'bK' or board[0][3] == 'bk':
-            KingSafety += -3
+            KingSafety += -10
         PawnStructure = 0
         pieceActivity = 0
 
