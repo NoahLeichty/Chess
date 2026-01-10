@@ -32,6 +32,8 @@ class ChessBot:
         mobility = len(self.gameState.getValidMoves())
         KingSafety = 0
         CenterControl = 0
+        PawnStructure = 0
+        pieceActivity = 0
         
         if board[3][3] in ['bN','bB','bR','bQ'] or board[3][4] in ['bN','bB','bR','bQ'] or board[4][3] in ['bN','bB','bR','bQ'] or board[4][4] in ['bN','bB','bR','bQ']:
             CenterControl += -0.1
@@ -39,8 +41,6 @@ class ChessBot:
             CenterControl += -1
         if board[0][6] == 'bK' or board[0][3] == 'bk':
             KingSafety += -10
-        PawnStructure = 0
-        pieceActivity = 0
 
         if self.gameState.moveLog:
             lastMove = self.gameState.moveLog[-1]
