@@ -45,6 +45,8 @@ class ChessBot:
         if self.gameState.moveLog:
             lastMove = self.gameState.moveLog[-1]
             pass
+        
+        
 
         evaluation = self.simpleBoardEvaluation()
         return evaluation + (mobility * 0.1) + (CenterControl) + (KingSafety) + (PawnStructure * 0.03) + (pieceActivity * 0.02)
