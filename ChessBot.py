@@ -38,11 +38,11 @@ class ChessBot:
         #if board[3][3] in ['bN','bB','bR','bQ'] or board[3][4] in ['bN','bB','bR','bQ'] or board[4][3] in ['bN','bB','bR','bQ'] or board[4][4] in ['bN','bB','bR','bQ']:
             #CenterControl += -0.1
         if board[3][3] in ['bP'] or board[3][4] in ['bP'] or board[4][3] in ['bP'] or board[4][4] in ['bP']:
-            CenterControl += -1
+            CenterControl += -1.5
         if board[2][2] == "bN" or board[2][5] == "bN":
-            pieceActivity += -0.5
+            pieceActivity += -0.1
         if board[0][6] == 'bK' or board[0][3] == 'bk':
-            KingSafety += -10
+            KingSafety += -5
 
         if self.gameState.moveLog:
             lastMove = self.gameState.moveLog[-1]
