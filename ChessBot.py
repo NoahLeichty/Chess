@@ -46,6 +46,8 @@ class ChessBot:
         if board[2][5] in ['bQ']:
             pieceActivity += 100
 
+        
+
         if self.gameState.moveLog:
             lastMove = self.gameState.moveLog[-1]
             pass
