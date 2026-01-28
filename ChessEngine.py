@@ -42,6 +42,7 @@ class GameState():
         self.inCheck = False
         self.pins = []
         self.checks = []
+        self.isCapture = False
 
     def makeMove(self, move):
         self.board[move.startRow][move.startCol] = "--"
@@ -120,6 +121,8 @@ class GameState():
                 else: # queenside
                     self.board[move.endRow][move.endCol - 2] = self.board[move.endRow][move.endCol + 1]
                     self.board[move.endRow][move.endCol + 1] = "--"
+            if move.isCapture:
+                self.isCapture = False
     
     # All moves considering checks
     
@@ -229,6 +232,7 @@ class GameState():
                     if r + moveAmount == backRow:
                         isPawnPromotion = True
                     moves.append(Move((r,c), (r + moveAmount, c - 1), self.board, isPawnPromotion = isPawnPromotion))
+                    self.isCapture = True
                 if (r + moveAmount, c - 1) == self.enpassantPossible:
                     moves.append(Move((r,c), (r + moveAmount, c - 1), self.board, isEnpassantMove = True))
         if c + 1 <= 7: # capture to the right
@@ -237,6 +241,7 @@ class GameState():
                     if r + moveAmount == backRow:
                         isPawnPromotion = True
                     moves.append(Move((r,c), (r + moveAmount, c + 1), self.board, isPawnPromotion = isPawnPromotion))
+                    self.isCapture = True
                 if (r + moveAmount, c + 1) == self.enpassantPossible:
                     moves.append(Move((r,c), (r + moveAmount, c + 1), self.board, isEnpassantMove = True))
 
@@ -264,6 +269,7 @@ class GameState():
                             moves.append(Move((r,c), (endRow, endCol), self.board))
                         elif endPiece[0] == enemyColor:
                             moves.append(Move((r,c), (endRow, endCol), self.board))
+                            self.isCapture = True
                             break
                         else: # friendly piece invalid
                             break
@@ -288,6 +294,7 @@ class GameState():
                     endPiece = self.board[endRow][endCol]
                     if endPiece[0] != allyColor:
                         moves.append(Move((r,c), (endRow, endCol), self.board))
+                        self.isCapture = True if endPiece != "--" else False
 
     def getBishopMoves(self, r, c, moves):
         piecePinned = False
@@ -312,6 +319,7 @@ class GameState():
                             moves.append(Move((r,c), (endRow, endCol), self.board))
                         elif endPiece[0] == enemyColor:
                             moves.append(Move((r, c), (endRow, endCol), self.board))
+                            self.isCapture = True
                             break
                         else:
                             break

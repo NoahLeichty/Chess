@@ -107,6 +107,7 @@ def main():
                     playerClicks = []
                     moveMade = False
                     animate = False
+                    gs.isCapture = False
         
         if moveMade:
             if animate:
