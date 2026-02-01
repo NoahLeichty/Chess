@@ -43,6 +43,7 @@ class GameState():
         self.pins = []
         self.checks = []
         self.isCapture = False
+        self.capturedPiece = None
 
     def makeMove(self, move):
         self.board[move.startRow][move.startCol] = "--"
