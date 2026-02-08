@@ -234,6 +234,7 @@ class GameState():
                         isPawnPromotion = True
                     moves.append(Move((r,c), (r + moveAmount, c - 1), self.board, isPawnPromotion = isPawnPromotion))
                     self.isCapture = True
+                    self.capturedPiece = self.board[r + moveAmount][c - 1][1]
                 if (r + moveAmount, c - 1) == self.enpassantPossible:
                     moves.append(Move((r,c), (r + moveAmount, c - 1), self.board, isEnpassantMove = True))
         if c + 1 <= 7: # capture to the right
@@ -243,6 +244,7 @@ class GameState():
                         isPawnPromotion = True
                     moves.append(Move((r,c), (r + moveAmount, c + 1), self.board, isPawnPromotion = isPawnPromotion))
                     self.isCapture = True
+                    self.capturedPiece = self.board[r + moveAmount][c + 1][1]
                 if (r + moveAmount, c + 1) == self.enpassantPossible:
                     moves.append(Move((r,c), (r + moveAmount, c + 1), self.board, isEnpassantMove = True))
 
@@ -271,6 +273,7 @@ class GameState():
                         elif endPiece[0] == enemyColor:
                             moves.append(Move((r,c), (endRow, endCol), self.board))
                             self.isCapture = True
+                            self.capturedPiece = endPiece[1]
                             break
                         else: # friendly piece invalid
                             break
@@ -296,6 +299,7 @@ class GameState():
                     if endPiece[0] != allyColor:
                         moves.append(Move((r,c), (endRow, endCol), self.board))
                         self.isCapture = True if endPiece != "--" else False
+                        self.capturedPiece = endPiece[1] if endPiece != "--" else None
 
     def getBishopMoves(self, r, c, moves):
         piecePinned = False
@@ -321,6 +325,7 @@ class GameState():
                         elif endPiece[0] == enemyColor:
                             moves.append(Move((r, c), (endRow, endCol), self.board))
                             self.isCapture = True
+                            self.capturedPiece = endPiece[1]
                             break
                         else:
                             break
