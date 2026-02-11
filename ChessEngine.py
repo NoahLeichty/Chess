@@ -227,6 +227,7 @@ class GameState():
                 moves.append(Move((r,c), (r + moveAmount, c), self.board, isPawnPromotion = isPawnPromotion))
                 if r == startRow and self.board[r + 2 * moveAmount][c] == "--": # 2 square pawn advance
                     moves.append(Move((r,c), (r + 2 * moveAmount, c), self.board))
+                    self.capturedPiece = None
         if c - 1 >= 0: # capture to the left
             if not piecePinned or pinDirection == (moveAmount, -1):
                 if self.board[r + moveAmount][c - 1][0] == enemyColor:
@@ -270,6 +271,7 @@ class GameState():
                         endPiece = self.board[endRow][endCol]
                         if endPiece == "--":
                             moves.append(Move((r,c), (endRow, endCol), self.board))
+                            self.capturedPiece = None
                         elif endPiece[0] == enemyColor:
                             moves.append(Move((r,c), (endRow, endCol), self.board))
                             self.isCapture = True
@@ -299,7 +301,10 @@ class GameState():
                     if endPiece[0] != allyColor:
                         moves.append(Move((r,c), (endRow, endCol), self.board))
                         self.isCapture = True if endPiece != "--" else False
-                        self.capturedPiece = endPiece[1] if endPiece != "--" else None
+                        if endPiece != "--":
+                            self.capturedPiece = endPiece[1] 
+                        else:
+                            self.capturedPiece = None
 
     def getBishopMoves(self, r, c, moves):
         piecePinned = False
@@ -322,6 +327,7 @@ class GameState():
                         endPiece = self.board[endRow][endCol]
                         if endPiece == "--":
                             moves.append(Move((r,c), (endRow, endCol), self.board))
+                            self.capturedPiece = None
                         elif endPiece[0] == enemyColor:
                             moves.append(Move((r, c), (endRow, endCol), self.board))
                             self.isCapture = True
