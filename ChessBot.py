@@ -1,6 +1,5 @@
 #will be logic for a chess bot to make moves
 import ChessEngine
-import my_module
 
 class ChessBot:
     def __init__(self, gameState):

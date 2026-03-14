@@ -33,6 +33,8 @@ def main():
     sqSelected = () # no square is selected
     playerClicks = [] # keep track of player clicks
     gameOver = False
+    playerOne = True # if a human is playing white, then this will be True. If an AI is playing, then False
+    playerTwo = False # same as above but for black
 
     queenPromotion = p.image.load("assets/wq.png").convert_alpha()
     queenPromotionRect = queenPromotion.get_rect(topleft=(250,250))  # Position the button
@@ -49,11 +51,12 @@ def main():
     #playBlack.draw(screen)
 
     while running:
+        humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not gameOver:
+                if not gameOver and humanTurn:
                     if queenPromotionRect.collidepoint(e.pos):
                         print("Button clicked!")
 
@@ -88,9 +91,7 @@ def main():
                                 playerClicks = []
                                 #makes bot move
                                 #need to improve this because it does not trigger checkmate/stalemate
-                                bot.gameState = gs # update bot's game state
-                                botMove = bot.makeBestMove(gs.getValidMoves(), 3)
-                                gs.makeMove(botMove)
+                                
                                 
                         if not moveMade:
                             playerClicks = [sqSelected]
@@ -108,6 +109,18 @@ def main():
                     moveMade = False
                     animate = False
                     gs.isCapture = False
+        
+        #AI move finder
+        if not gameOver and not humanTurn:
+            bot.gameState = gs # update bot's game state
+            botMove = bot.makeBestMove(validMoves, 3)
+            if botMove is None:
+                print("No valid moves for the bot. Game over.")
+                gameOver = True
+            else:
+                gs.makeMove(botMove)
+                moveMade = True
+                animate = True
         
         if moveMade:
             if animate:
