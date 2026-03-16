@@ -20,7 +20,7 @@ def loadimages():
 def main():
     p.init
     p.font.init()
-    screen = p.display.set_mode((WIDTH, HEIGHT))
+    screen = p.display.set_mode((WIDTH, HEIGHT), p.SCALED)
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = ChessEngine.GameState()
@@ -36,15 +36,6 @@ def main():
     playerOne = True # if a human is playing white, then this will be True. If an AI is playing, then False
     playerTwo = False # same as above but for black
 
-    queenPromotion = p.image.load("assets/wq.png").convert_alpha()
-    queenPromotionRect = queenPromotion.get_rect(topleft=(250,250))  # Position the button
-    rookPromotion = p.image.load("assets/wr.png").convert_alpha()
-    rookPromotionRect = rookPromotion.get_rect(topleft=(350,250))  # Position the button
-    bishopPromotion = p.image.load("assets/wb.png").convert_alpha()
-    bishopPromotionRect = bishopPromotion.get_rect(topleft=(250,350))  # Position the button
-    knightPromotion = p.image.load("assets/wn.png").convert_alpha()
-    knightPromotionRect = knightPromotion.get_rect(topleft=(350,350))  # Position the button
-
     playWhite = Button(10, 10, 150, 50, "Play White", p.Color('Black'), p.Color('light green'), )
     playBlack = Button(200, 10, 150, 50, "Play Black", p.Color('Black'), p.Color('light green'), )
     #playWhite.draw(screen)
@@ -57,8 +48,6 @@ def main():
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
                 if not gameOver and humanTurn:
-                    if queenPromotionRect.collidepoint(e.pos):
-                        print("Button clicked!")
 
                     location = p.mouse.get_pos() # location of mouse
                     col = location[0]//SQ_SIZE
