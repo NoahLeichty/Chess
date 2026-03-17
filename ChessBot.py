@@ -25,6 +25,8 @@ class ChessBot:
     def evaluateBoard(self):
         # An advanced board evaluation function considering multiple factors
         board = self.gameState.board
+
+        pieceValue = {"wP": 1, "wN":3, "wB":3, "wR":5, "wQ":9, "bP": 1, "bN":3, "bB":3, "bR":5, "bQ":9}
         
         pieceEvaluation = 0
         totalEvaluation = 0
@@ -45,8 +47,11 @@ class ChessBot:
             pass
 
         if self.gameState.isCapture:
-            pass
+            pass #if self.gameState.capturedPiece
         else:
+            pass
+
+        if self.gameState.checkmate:
             pass
 
         #if board[3][3] in ['bN','bB','bR','bQ'] or board[3][4] in ['bN','bB','bR','bQ'] or board[4][3] in ['bN','bB','bR','bQ'] or board[4][4] in ['bN','bB','bR','bQ']:

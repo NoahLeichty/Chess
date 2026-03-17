@@ -33,7 +33,7 @@ def main():
     sqSelected = () # no square is selected
     playerClicks = [] # keep track of player clicks
     gameOver = False
-    playerOne = True # if a human is playing white, then this will be True. If an AI is playing, then False
+    playerOne = False # if a human is playing white, then this will be True. If an AI is playing, then False
     playerTwo = False # same as above but for black
 
     playWhite = Button(10, 10, 150, 50, "Play White", p.Color('Black'), p.Color('light green'), )
@@ -78,8 +78,6 @@ def main():
                                 animate = True
                                 sqSelected = () # reset user clicks
                                 playerClicks = []
-                                #makes bot move
-                                #need to improve this because it does not trigger checkmate/stalemate
                                 
                                 
                         if not moveMade:
@@ -98,11 +96,15 @@ def main():
                     moveMade = False
                     animate = False
                     gs.isCapture = False
+                    playerOne = playerOne
+                    playerTwo = playerTwo
+                elif e.key == p.K_q:
+                    p.QUIT
         
         #AI move finder
         if not gameOver and not humanTurn:
             bot.gameState = gs # update bot's game state
-            botMove = bot.makeBestMove(validMoves, 3)
+            botMove = bot.makeBestMove(validMoves, 4)
             if botMove is None:
                 print("No valid moves for the bot. Game over.")
                 gameOver = True
@@ -110,6 +112,7 @@ def main():
                 gs.makeMove(botMove)
                 moveMade = True
                 animate = True
+                print(gs.lastMoves)
         
         if moveMade:
             if animate:

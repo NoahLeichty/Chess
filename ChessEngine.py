@@ -44,6 +44,7 @@ class GameState():
         self.checks = []
         self.isCapture = False
         self.capturedPiece = None
+        self.lastMoves = []
 
     def makeMove(self, move):
         self.board[move.startRow][move.startCol] = "--"
@@ -84,6 +85,12 @@ class GameState():
         self.updateCastlingRights(move)
         self.castleRightsLog.append(CastleRights(self.whiteCastleKingside, self.blackCastleKingside,
                                                  self.whiteCastleQueenside, self.blackCastleQueenside))
+        
+        if len(self.lastMoves) == 2:
+            self.lastMoves.append(move.getChessNotation())
+            self.lastMoves.pop(0)
+        else:
+            self.lastMoves.append(move.getChessNotation())
     
     def undoMove(self):
         if len(self.moveLog) != 0:
@@ -176,6 +183,15 @@ class GameState():
         else:
             self.checkmate = False
             self.stalemate = False
+        
+        count = 0
+        if len(self.moveLog) > 0:
+            if self.moveLog[-1].getChessNotation() in self.lastMoves:
+                count += 1
+            else:
+                count = 0
+        if count >= 3:
+            self.stalemate == True
 
         self.enpassantPossible = tempEnpassantPossible 
         return moves
