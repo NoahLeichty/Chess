@@ -44,6 +44,7 @@ class GameState():
         self.checks = []
         self.isCapture = False
         self.capturedPiece = None
+        self.capturingPiece = None
         self.lastMoves = []
 
     def makeMove(self, move):
@@ -131,6 +132,9 @@ class GameState():
                     self.board[move.endRow][move.endCol + 1] = "--"
             if move.isCapture:
                 self.isCapture = False
+            
+            self.checkmate = False
+            self.stalemate = False
     
     # All moves considering checks
     
@@ -244,6 +248,7 @@ class GameState():
                 if r == startRow and self.board[r + 2 * moveAmount][c] == "--": # 2 square pawn advance
                     moves.append(Move((r,c), (r + 2 * moveAmount, c), self.board))
                     self.capturedPiece = None
+                    self.capturingPiece = None
         if c - 1 >= 0: # capture to the left
             if not piecePinned or pinDirection == (moveAmount, -1):
                 if self.board[r + moveAmount][c - 1][0] == enemyColor:
@@ -252,6 +257,7 @@ class GameState():
                     moves.append(Move((r,c), (r + moveAmount, c - 1), self.board, isPawnPromotion = isPawnPromotion))
                     self.isCapture = True
                     self.capturedPiece = self.board[r + moveAmount][c - 1][1]
+                    self.capturingPiece = self.board[r][c][1]
                 if (r + moveAmount, c - 1) == self.enpassantPossible:
                     moves.append(Move((r,c), (r + moveAmount, c - 1), self.board, isEnpassantMove = True))
         if c + 1 <= 7: # capture to the right
@@ -262,6 +268,7 @@ class GameState():
                     moves.append(Move((r,c), (r + moveAmount, c + 1), self.board, isPawnPromotion = isPawnPromotion))
                     self.isCapture = True
                     self.capturedPiece = self.board[r + moveAmount][c + 1][1]
+                    self.capturingPiece = self.board[r][c][1]
                 if (r + moveAmount, c + 1) == self.enpassantPossible:
                     moves.append(Move((r,c), (r + moveAmount, c + 1), self.board, isEnpassantMove = True))
 
@@ -288,10 +295,12 @@ class GameState():
                         if endPiece == "--":
                             moves.append(Move((r,c), (endRow, endCol), self.board))
                             self.capturedPiece = None
+                            self.capturingPiece = None
                         elif endPiece[0] == enemyColor:
                             moves.append(Move((r,c), (endRow, endCol), self.board))
                             self.isCapture = True
                             self.capturedPiece = endPiece[1]
+                            self.capturingPiece = self.board[r][c][1]
                             break
                         else: # friendly piece invalid
                             break
@@ -318,9 +327,11 @@ class GameState():
                         moves.append(Move((r,c), (endRow, endCol), self.board))
                         self.isCapture = True if endPiece != "--" else False
                         if endPiece != "--":
-                            self.capturedPiece = endPiece[1] 
+                            self.capturedPiece = endPiece[1]
+                            self.capturingPiece = self.board[r][c][1]
                         else:
                             self.capturedPiece = None
+                            self.capturingPiece = None
 
     def getBishopMoves(self, r, c, moves):
         piecePinned = False
@@ -344,10 +355,12 @@ class GameState():
                         if endPiece == "--":
                             moves.append(Move((r,c), (endRow, endCol), self.board))
                             self.capturedPiece = None
+                            self.capturingPiece = None
                         elif endPiece[0] == enemyColor:
                             moves.append(Move((r, c), (endRow, endCol), self.board))
                             self.isCapture = True
                             self.capturedPiece = endPiece[1]
+                            self.capturingPiece = self.board[r][c][1]
                             break
                         else:
                             break

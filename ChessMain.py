@@ -88,6 +88,7 @@ def main():
                     gs.undoMove()
                     moveMade = True
                     animate = False
+                    gameOver = False
                 elif e.key == p.K_r: # reset the game when 'r' is pressed
                     gs = ChessEngine.GameState()
                     validMoves = gs.getValidMoves()
@@ -96,15 +97,14 @@ def main():
                     moveMade = False
                     animate = False
                     gs.isCapture = False
-                    playerOne = playerOne
-                    playerTwo = playerTwo
+                    gameOver = False
                 elif e.key == p.K_q:
                     p.QUIT
         
         #AI move finder
         if not gameOver and not humanTurn:
             bot.gameState = gs # update bot's game state
-            botMove = bot.makeBestMove(validMoves, 4)
+            botMove = bot.makeBestMove(validMoves, 3)
             if botMove is None:
                 print("No valid moves for the bot. Game over.")
                 gameOver = True

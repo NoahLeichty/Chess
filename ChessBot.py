@@ -1,5 +1,8 @@
 #will be logic for a chess bot to make moves
 import ChessEngine
+pieceValue = {"K": 0, "P": 1, "N":3, "B":3, "R":5, "Q":9,"--":0}
+checkmate = 10000
+stalemate = 0
 
 class ChessBot:
     def __init__(self, gameState):
@@ -25,8 +28,6 @@ class ChessBot:
     def evaluateBoard(self):
         # An advanced board evaluation function considering multiple factors
         board = self.gameState.board
-
-        pieceValue = {"wP": 1, "wN":3, "wB":3, "wR":5, "wQ":9, "bP": 1, "bN":3, "bB":3, "bR":5, "bQ":9}
         
         pieceEvaluation = 0
         totalEvaluation = 0
@@ -47,11 +48,10 @@ class ChessBot:
             pass
 
         if self.gameState.isCapture:
-            pass #if self.gameState.capturedPiece
+            if self.gameState.capturedPiece != None and self.gameState.capturingPiece != None:
+                if pieceValue[self.gameState.capturedPiece] > pieceValue[self.gameState.capturingPiece]:
+                    totalEvaluation += 1000
         else:
-            pass
-
-        if self.gameState.checkmate:
             pass
 
         #if board[3][3] in ['bN','bB','bR','bQ'] or board[3][4] in ['bN','bB','bR','bQ'] or board[4][3] in ['bN','bB','bR','bQ'] or board[4][4] in ['bN','bB','bR','bQ']:
@@ -72,7 +72,7 @@ class ChessBot:
             pass
 
         evaluation = self.simpleBoardEvaluation()
-        return evaluation + (mobility * 0.1) + (CenterControl) + (KingSafety) + (PawnStructure * 0.03) + (pieceActivity)
+        return evaluation + (mobility * 0.1) + (CenterControl) + (KingSafety) + (PawnStructure * 0.03) + (pieceActivity) + totalEvaluation
     
     # A simpler board evaluation function that focuses solely on material count
     def simpleBoardEvaluation(self):
@@ -80,35 +80,15 @@ class ChessBot:
         pieceEvaluation = 0
         for row in board:
             for square in row:
-                if square == 'wP':
-                    pieceEvaluation += 1
-                elif square == 'bP':
-                    pieceEvaluation -= 1
-                elif square == 'wN':
-                    pieceEvaluation += 3
-                elif square == 'bN':
-                    pieceEvaluation -= 3
-                elif square == 'wB':
-                    pieceEvaluation += 3
-                elif square == 'bB':
-                    pieceEvaluation -= 3
-                elif square == 'wR':
-                    pieceEvaluation += 5
-                elif square == 'bR':
-                    pieceEvaluation -= 5
-                elif square == 'wQ':
-                    pieceEvaluation += 9
-                elif square == 'bQ':
-                    pieceEvaluation -= 9
-                elif square == 'wK':
-                    pieceEvaluation += 1000
-                elif square == 'bK':
-                    pieceEvaluation -= 1000
+                if square[0] == "w":
+                    pieceEvaluation += pieceValue[square[1]]
+                if square[0] == "b":
+                    pieceEvaluation -= pieceValue[square[1]]
         return pieceEvaluation
         
-    def minMax(self, node, depth, maximizingPlayer):
+    def minMax(self, depth, maximizingPlayer):
         if depth == 0:
-            return node
+            return self.evaluateBoard()
     
     # Minimax algorithm with negamax simplification
     def negaMax(self, depth,color):
@@ -168,13 +148,18 @@ class ChessBot:
                moveScore += 10  # Prioritize captures
         return moveScore
         
-    # Choose the best move using negamax
+    # Choose the best move
     def makeBestMove(self, validMoves, depth):
         bestMove = None
         maxEval = -float('inf')
         for move in validMoves:
             self.gameState.makeMove(move)
-            eval = -self.alphaBeta(-float('inf'), float('inf'), depth - 1)
+            if self.gameState.checkmate:
+                eval = -checkmate
+            if self.gameState.stalemate:
+                eval = -stalemate
+            else:
+                eval = -self.alphaBeta(-float('inf'), float('inf'), depth - 1)
             self.gameState.undoMove()
             if eval > maxEval:
                 maxEval = eval
