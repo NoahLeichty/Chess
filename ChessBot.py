@@ -25,9 +25,17 @@ class ChessBot:
                           ]
         return pawnEvalutaion
 
-    def evaluateBoard(self):
+    def evaluateBoard(self, gs):
         # An advanced board evaluation function considering multiple factors
         board = self.gameState.board
+
+        if gs.checkmate:
+            if gs.whiteToMove:
+                return -checkmate
+            else:
+                return checkmate
+        if gs.stalemate:
+            return stalemate
         
         pieceEvaluation = 0
         totalEvaluation = 0
@@ -47,12 +55,6 @@ class ChessBot:
         else:
             pass
 
-        if self.gameState.isCapture:
-            if self.gameState.capturedPiece != None and self.gameState.capturingPiece != None:
-                if pieceValue[self.gameState.capturedPiece] > pieceValue[self.gameState.capturingPiece]:
-                    totalEvaluation += 1000
-        else:
-            pass
 
         #if board[3][3] in ['bN','bB','bR','bQ'] or board[3][4] in ['bN','bB','bR','bQ'] or board[4][3] in ['bN','bB','bR','bQ'] or board[4][4] in ['bN','bB','bR','bQ']:
             #CenterControl += -0.1
@@ -65,7 +67,7 @@ class ChessBot:
         if board[0][6] == 'bK' or board[0][3] == 'bk':
             KingSafety += -5
         if board[2][5] in ['bQ']:
-            pieceActivity += 100
+            pieceActivity += 10
 
         if self.gameState.moveLog:
             lastMove = self.gameState.moveLog[-1]
@@ -86,34 +88,56 @@ class ChessBot:
                     pieceEvaluation -= pieceValue[square[1]]
         return pieceEvaluation
         
-    def minMax(self, depth, maximizingPlayer):
+    def minMax(self, gs, validMoves, depth, whiteToMove):
         if depth == 0:
-            return self.evaluateBoard()
+            return self.evaluateBoard(gs)
+        bestMove = None
+        
+        if whiteToMove:
+            maxScore = -checkmate
+            for move in validMoves:
+                gs.makeMove(move)
+                nextMoves = gs.getValidMoves()
+                score = self.minMax(gs,nextMoves, depth -1, not whiteToMove)
+                gs.undoMove()
+                if score > maxScore:
+                    maxScore = score
+            return maxScore
+        else:
+            minScore = checkmate
+            for move in validMoves:
+                gs.makeMove(move)
+                nextMoves = gs.getValidMoves()
+                score = self.minMax(gs,nextMoves, depth-1, whiteToMove)
+                gs.undoMove()
+                if score < minScore:
+                    minScore = score
+            return minScore
     
     # Minimax algorithm with negamax simplification
-    def negaMax(self, depth,color):
+    def negaMax(self, gs, depth, color):
         if depth == 0:    
-            return  color * self.evaluateBoard()
+            return  color * self.evaluateBoard(gs)
         maxEval = -float('inf')
         for move in self.gameState.getValidMoves():
             self.gameState.makeMove(move)
-            eval = -self.negaMax(depth - 1,-color)
+            eval = -self.negaMax(gs, depth - 1,-color)
             self.gameState.undoMove()
             if eval > maxEval:
                 maxEval = eval
         return maxEval
     
     # Alpha-Beta pruning implementation
-    def alphaBeta(self, alpha, beta, depth):
+    def alphaBeta(self, gs, alpha, beta, depth):
         if depth == 0:
-            return self.evaluateBoard()
+            return self.evaluateBoard(gs)
         maxEval = -float('inf')
-        if self.gameState.checkmate:
+        if gs.checkmate:
             return -float('inf')
-        for move in self.gameState.getValidMoves():
-            self.gameState.makeMove(move)
-            eval = -self.alphaBeta(-beta, -alpha, depth - 1)
-            self.gameState.undoMove()
+        for move in gs.getValidMoves():
+            gs.makeMove(move)
+            eval = -self.alphaBeta(gs, -beta, -alpha, depth - 1)
+            gs.undoMove()
             if eval > maxEval:
                 maxEval = eval
                 if eval > alpha:
@@ -149,18 +173,13 @@ class ChessBot:
         return moveScore
         
     # Choose the best move
-    def makeBestMove(self, validMoves, depth):
+    def makeBestMove(self, gs, validMoves, depth):
         bestMove = None
         maxEval = -float('inf')
         for move in validMoves:
-            self.gameState.makeMove(move)
-            if self.gameState.checkmate:
-                eval = -checkmate
-            if self.gameState.stalemate:
-                eval = -stalemate
-            else:
-                eval = -self.alphaBeta(-float('inf'), float('inf'), depth - 1)
-            self.gameState.undoMove()
+            gs.makeMove(move)
+            eval = -self.minMax(gs,validMoves,depth -1, True)
+            gs.undoMove()
             if eval > maxEval:
                 maxEval = eval
                 bestMove = move

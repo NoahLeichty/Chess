@@ -104,7 +104,7 @@ def main():
         #AI move finder
         if not gameOver and not humanTurn:
             bot.gameState = gs # update bot's game state
-            botMove = bot.makeBestMove(validMoves, 3)
+            botMove = bot.makeBestMove(gs, validMoves, 3)
             if botMove is None:
                 print("No valid moves for the bot. Game over.")
                 gameOver = True
