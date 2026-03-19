@@ -88,27 +88,25 @@ class ChessBot:
                     pieceEvaluation -= pieceValue[square[1]]
         return pieceEvaluation
         
-    def minMax(self, gs, validMoves, depth, whiteToMove):
+    def minMax(self, gs, depth, whiteToMove):
         if depth == 0:
             return self.evaluateBoard(gs)
         bestMove = None
         
         if whiteToMove:
             maxScore = -checkmate
-            for move in validMoves:
+            for move in gs.getValidMoves():
                 gs.makeMove(move)
-                nextMoves = gs.getValidMoves()
-                score = self.minMax(gs,nextMoves, depth -1, not whiteToMove)
+                score = self.minMax(gs, depth -1, not whiteToMove)
                 gs.undoMove()
                 if score > maxScore:
                     maxScore = score
             return maxScore
         else:
             minScore = checkmate
-            for move in validMoves:
+            for move in gs.getValidMoves():
                 gs.makeMove(move)
-                nextMoves = gs.getValidMoves()
-                score = self.minMax(gs,nextMoves, depth-1, whiteToMove)
+                score = self.minMax(gs, depth-1, whiteToMove)
                 gs.undoMove()
                 if score < minScore:
                     minScore = score
@@ -118,11 +116,11 @@ class ChessBot:
     def negaMax(self, gs, depth, color):
         if depth == 0:    
             return  color * self.evaluateBoard(gs)
-        maxEval = -float('inf')
-        for move in self.gameState.getValidMoves():
-            self.gameState.makeMove(move)
-            eval = -self.negaMax(gs, depth - 1,-color)
-            self.gameState.undoMove()
+        maxEval = -checkmate
+        for move in gs.getValidMoves():
+            gs.makeMove(move)
+            eval = -self.negaMax(gs, depth - 1, -color)
+            gs.undoMove()
             if eval > maxEval:
                 maxEval = eval
         return maxEval
@@ -132,8 +130,8 @@ class ChessBot:
         if depth == 0:
             return self.evaluateBoard(gs)
         maxEval = -float('inf')
-        if gs.checkmate:
-            return -float('inf')
+        if gs.stalemate:
+            return stalemate
         for move in gs.getValidMoves():
             gs.makeMove(move)
             eval = -self.alphaBeta(gs, -beta, -alpha, depth - 1)
@@ -144,6 +142,23 @@ class ChessBot:
                     alpha = eval
             if eval >= beta:
                 return beta
+        return maxEval
+    
+    def negaMaxAlphaBeta(self, gs, depth, alpha, beta, color):
+        if depth == 0:    
+            return  color * self.evaluateBoard(gs)
+        maxEval = -checkmate
+        #impliment move ordering later
+        for move in gs.getValidMoves():
+            gs.makeMove(move)
+            eval = -self.negaMaxAlphaBeta(gs, depth - 1, -beta, -alpha, -color)
+            gs.undoMove()
+            if eval > maxEval:
+                maxEval = eval
+            if maxEval > alpha:
+                alpha = maxEval
+            if alpha >= beta:
+                break
         return maxEval
     
     # Quiescence Search that extends the search for "quiet" positions
@@ -178,7 +193,7 @@ class ChessBot:
         maxEval = -float('inf')
         for move in validMoves:
             gs.makeMove(move)
-            eval = -self.minMax(gs,validMoves,depth -1, True)
+            eval = -self.negaMaxAlphaBeta(gs, depth -1, -checkmate, checkmate, 1 if gs.whiteToMove else -1)
             gs.undoMove()
             if eval > maxEval:
                 maxEval = eval
