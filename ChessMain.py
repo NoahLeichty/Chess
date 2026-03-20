@@ -5,7 +5,9 @@ import ChessEngine
 import ChessBot
 import sys
 
-WIDTH = HEIGHT = 700
+WIDTH = HEIGHT = 512
+MOVE_LOG_PANEL_WIDTH = 250
+MOVE_LOG_PANEL_HEIGHT = WIDTH
 DIMENSION = 8
 SQ_SIZE = HEIGHT // DIMENSION
 MAX_FPS = 15
@@ -20,9 +22,10 @@ def loadimages():
 def main():
     p.init
     p.font.init()
-    screen = p.display.set_mode((WIDTH, HEIGHT), p.SCALED)
+    screen = p.display.set_mode((WIDTH + MOVE_LOG_PANEL_WIDTH, HEIGHT), p.SCALED)
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
+    moveLogFont = p.font.SysFont("Arial", 12, False, False)
     gs = ChessEngine.GameState()
     bot = ChessBot.ChessBot(gs)
     validMoves = gs.getValidMoves()
@@ -34,7 +37,7 @@ def main():
     playerClicks = [] # keep track of player clicks
     gameOver = False
     playerOne = True # if a human is playing white, then this will be True. If an AI is playing, then False
-    playerTwo = False # same as above but for black
+    playerTwo = True # same as above but for black
 
     playWhite = Button(10, 10, 150, 50, "Play White", p.Color('Black'), p.Color('light green'), )
     playBlack = Button(200, 10, 150, 50, "Play Black", p.Color('Black'), p.Color('light green'), )
@@ -48,11 +51,11 @@ def main():
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
                 if not gameOver and humanTurn:
-
+                    
                     location = p.mouse.get_pos() # location of mouse
                     col = location[0]//SQ_SIZE
                     row = location[1]//SQ_SIZE
-                    if sqSelected == (row,col): # the user clicked the same square twice
+                    if sqSelected == (row,col) or col >= 8: # the user clicked the same square twice
                         sqSelected = () # deselect
                         playerClicks = [] # clear player clicks
                     else:
@@ -60,7 +63,7 @@ def main():
                         playerClicks.append(sqSelected) # append both clicks
                     if len(playerClicks) == 2:
                         move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                        print(move.getChessNotation())
+                        #print(move.getChessNotation())
                         # Old move validation method
                         """if move in validMoves:
                             gs.makeMove(move)
@@ -119,7 +122,7 @@ def main():
             validMoves = gs.getValidMoves()
             moveMade = False
         
-        drawGameStateWhite(screen, gs, validMoves, sqSelected)
+        drawGameStateWhite(screen, gs, validMoves, sqSelected, moveLogFont)
 
         #screen.blit(queenPromotion, queenPromotionRect.topleft)  #Draw button
         #screen.blit(rookPromotion, rookPromotionRect.topleft)
@@ -129,12 +132,12 @@ def main():
         if gs.checkmate:
             gameOver = True
             if gs.whiteToMove:
-                drawText(screen, 'Black wins by checkmate')
+                drawEndGameText(screen, 'Black wins by checkmate')
             else:
-                drawText(screen, 'White wins by checkmate')
+                drawEndGameText(screen, 'White wins by checkmate')
         elif gs.stalemate:
             gameOver = True
-            drawText(screen, 'Stalemate')
+            drawEndGameText(screen, 'Stalemate')
 
         clock.tick(MAX_FPS)
         p.display.flip()
@@ -156,10 +159,11 @@ def highlightSquares(screen, gs, validMoves, sqSelected):
                     screen.blit(s, (move.endCol*SQ_SIZE, move.endRow*SQ_SIZE))
 
 # Draws the squares on the board and pieces
-def drawGameStateWhite(screen,gs, validMoves, sqSelected):
+def drawGameStateWhite(screen,gs, validMoves, sqSelected, moveLogFont):
     drawBoard(screen)
     highlightSquares(screen, gs, validMoves, sqSelected)
     drawPieces(screen,gs.board)
+    drawMoveLog(screen, gs, moveLogFont)
 
 def drawGameStateBlack(screen,gs, validMoves, sqSelected):
     drawBoard(screen)
@@ -181,6 +185,31 @@ def drawPieces(screen,board):
             if piece != "--":
                 screen.blit(IMAGES[piece], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
+#draw move log
+def drawMoveLog(screen, gs, font):
+    moveLogRect = p.Rect(WIDTH, 0, MOVE_LOG_PANEL_WIDTH, MOVE_LOG_PANEL_HEIGHT)
+    p.draw.rect(screen, p.Color("black"), moveLogRect)
+    moveLog = gs.moveLog
+    moveTexts = []
+    for i in range(0,len(moveLog), 2):
+        moveString = str(i//2 + 1) + ". " + moveLog[i].getChessNotation() + " "
+        if i + 1 < len(moveLog): # make sure black made a move
+            moveString += moveLog[i + 1].getChessNotation()
+        moveTexts.append(moveString)
+    movesPerRow = 3
+    padding = 5
+    lineSpacing = 2
+    textY = padding
+    for i in range(0, len(moveTexts), movesPerRow):
+        text = ""
+        for j in range(movesPerRow):
+            if i + j < len(moveTexts):
+                text +="   " + moveTexts[i + j]
+        textObject = font.render(text, True, p.Color('White'))
+        textLocation = moveLogRect.move(padding, textY)
+        screen.blit(textObject, textLocation)
+        textY += textObject.get_height() + lineSpacing
+
 # move animation
 def animateMove(move, screen, board, clock):
     global colors
@@ -198,13 +227,17 @@ def animateMove(move, screen, board, clock):
         p.draw.rect(screen, color, endSquare)
         # draw captured piece onto rectangle
         if move.pieceCaptured != '--':
+            if move.isEnpassantMove:
+                enPassantRow = move.endRow +1 if move.pieceCaptured[0] else move.endRow -1
+                endSquare = p.Rect(move.endCol*SQ_SIZE, enPassantRow*SQ_SIZE, SQ_SIZE, SQ_SIZE)
             screen.blit(IMAGES[move.pieceCaptured], endSquare)
         # draw moving piece
         screen.blit(IMAGES[move.pieceMoved], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
         p.display.flip()
         clock.tick(60)
 
-def drawText(screen, text):
+
+def drawEndGameText(screen, text):
     font = p.font.SysFont("Helvitca", 32, True, False)
     textObject = font.render(text, 0, p.Color('Gray'))
     textLocation = p.Rect(0,0, WIDTH, HEIGHT).move(WIDTH/2 - textObject.get_width()/2, HEIGHT/2 - textObject.get_height()/2)

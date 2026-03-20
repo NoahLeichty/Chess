@@ -33,6 +33,7 @@ class GameState():
         self.checkmate = False
         self.stalemate = False
         self.enpassantPossible = () # coordinates for the square where en passant capture is possible
+        self.enpassantPossibleLog = [self.enpassantPossible]
         self.whiteCastleKingside = True
         self.whiteCastleQueenside = True
         self.blackCastleKingside = True
@@ -87,6 +88,8 @@ class GameState():
         self.castleRightsLog.append(CastleRights(self.whiteCastleKingside, self.blackCastleKingside,
                                                  self.whiteCastleQueenside, self.blackCastleQueenside))
         
+        self.enpassantPossibleLog.append(self.enpassantPossible)
+        
         if len(self.lastMoves) == 2:
             self.lastMoves.append(move.getChessNotation())
             self.lastMoves.pop(0)
@@ -110,10 +113,9 @@ class GameState():
             if move.isEnpassantMove:
                 self.board[move.endRow][move.endCol] = "--" # remove the pawn that was added in the wrong square
                 self.board[move.startRow][move.endCol] = move.pieceCaptured
-                self.enpassantPossible = (move.endRow, move.endCol)
-            # undo a 2 square pawn advance
-            if move.pieceMoved[1] == "P" and abs(move.startRow - move.endRow) == 2:
-                self.enpassantPossible = ()
+
+            self.enpassantPossibleLog.pop()
+            self.enpassantPossible = self.enpassantPossibleLog[-1]
             
             # undo castling rights
             self.castleRightsLog.pop() # get rid of the new castle rights from the move
@@ -247,6 +249,7 @@ class GameState():
                 moves.append(Move((r,c), (r + moveAmount, c), self.board, isPawnPromotion = isPawnPromotion))
                 if r == startRow and self.board[r + 2 * moveAmount][c] == "--": # 2 square pawn advance
                     moves.append(Move((r,c), (r + 2 * moveAmount, c), self.board))
+                    self.isCapture = False
                     self.capturedPiece = None
                     self.capturingPiece = None
         if c - 1 >= 0: # capture to the left
@@ -254,23 +257,23 @@ class GameState():
                 if self.board[r + moveAmount][c - 1][0] == enemyColor:
                     if r + moveAmount == backRow:
                         isPawnPromotion = True
-                    moves.append(Move((r,c), (r + moveAmount, c - 1), self.board, isPawnPromotion = isPawnPromotion))
                     self.isCapture = True
+                    moves.append(Move((r,c), (r + moveAmount, c - 1), self.board, isPawnPromotion = isPawnPromotion, isCapture=self.isCapture))
                     self.capturedPiece = self.board[r + moveAmount][c - 1][1]
                     self.capturingPiece = self.board[r][c][1]
                 if (r + moveAmount, c - 1) == self.enpassantPossible:
-                    moves.append(Move((r,c), (r + moveAmount, c - 1), self.board, isEnpassantMove = True))
+                    moves.append(Move((r,c), (r + moveAmount, c - 1), self.board, isEnpassantMove = True, isCapture=self.isCapture))
         if c + 1 <= 7: # capture to the right
             if not piecePinned or pinDirection == (moveAmount, 1):
                 if self.board[r + moveAmount][c + 1][0] == enemyColor:
                     if r + moveAmount == backRow:
                         isPawnPromotion = True
-                    moves.append(Move((r,c), (r + moveAmount, c + 1), self.board, isPawnPromotion = isPawnPromotion))
                     self.isCapture = True
+                    moves.append(Move((r,c), (r + moveAmount, c + 1), self.board, isPawnPromotion = isPawnPromotion, isCapture=self.isCapture))
                     self.capturedPiece = self.board[r + moveAmount][c + 1][1]
                     self.capturingPiece = self.board[r][c][1]
                 if (r + moveAmount, c + 1) == self.enpassantPossible:
-                    moves.append(Move((r,c), (r + moveAmount, c + 1), self.board, isEnpassantMove = True))
+                    moves.append(Move((r,c), (r + moveAmount, c + 1), self.board, isEnpassantMove = True, isCapture=True))
 
     def getRookMoves(self, r, c, moves):
         piecePinned = False
@@ -294,11 +297,12 @@ class GameState():
                         endPiece = self.board[endRow][endCol]
                         if endPiece == "--":
                             moves.append(Move((r,c), (endRow, endCol), self.board))
+                            self.isCapture = False
                             self.capturedPiece = None
                             self.capturingPiece = None
                         elif endPiece[0] == enemyColor:
-                            moves.append(Move((r,c), (endRow, endCol), self.board))
                             self.isCapture = True
+                            moves.append(Move((r,c), (endRow, endCol), self.board, isCapture=self.isCapture))
                             self.capturedPiece = endPiece[1]
                             self.capturingPiece = self.board[r][c][1]
                             break
@@ -324,12 +328,14 @@ class GameState():
                 if not piecePinned:
                     endPiece = self.board[endRow][endCol]
                     if endPiece[0] != allyColor:
-                        moves.append(Move((r,c), (endRow, endCol), self.board))
                         self.isCapture = True if endPiece != "--" else False
+                        moves.append(Move((r,c), (endRow, endCol), self.board, isCapture=self.isCapture))
                         if endPiece != "--":
+                            self.isCapture = True
                             self.capturedPiece = endPiece[1]
                             self.capturingPiece = self.board[r][c][1]
                         else:
+                            self.isCapture = False
                             self.capturedPiece = None
                             self.capturingPiece = None
 
@@ -354,11 +360,12 @@ class GameState():
                         endPiece = self.board[endRow][endCol]
                         if endPiece == "--":
                             moves.append(Move((r,c), (endRow, endCol), self.board))
+                            self.isCapture = False
                             self.capturedPiece = None
                             self.capturingPiece = None
                         elif endPiece[0] == enemyColor:
-                            moves.append(Move((r, c), (endRow, endCol), self.board))
                             self.isCapture = True
+                            moves.append(Move((r, c), (endRow, endCol), self.board, isCapture=self.isCapture))
                             self.capturedPiece = endPiece[1]
                             self.capturingPiece = self.board[r][c][1]
                             break
@@ -576,7 +583,25 @@ class Move():
         return False
 
     def getChessNotation(self):
-        return self.getRankFile(self.startRow, self.startCol) + self.getRankFile(self.endRow, self.endCol)
+        if self.pieceMoved[1] == "K" and self.endCol == 6:
+            return "O-O"
+        if self.pieceMoved[1] == "K" and self.endCol == 2:
+            return "O-O-O"
+        if self.pieceCaptured != "--" and self.pieceMoved[1] != "P":
+            return self.pieceMoved[1] + "x" + self.getRankFile(self.endRow, self.endCol)
+        if self.pieceCaptured != "--" and self.pieceMoved[1] == "P":
+            return self.colsToFiles[self.startCol] + "x" + self.getRankFile(self.endRow, self.endCol)
+        if self.endRow == 0 or self.endRow == 7:
+            return self.getRankFile(self.endRow, self.endCol) + "Q"
+        #capturing pawn promotion doesn't work properly
+        if self.pieceCaptured != "--" and self.pieceMoved[1] == "P" and self.endRow == 0:
+            return self.colsToFiles[self.startCol] + "x" + self.getRankFile(self.endRow, self.endCol) + "Q"
+        if self.pieceCaptured != "--" and self.pieceMoved[1] == "P" and self.self.endRow == 7:
+            return self.colsToFiles[self.startCol] + "x" + self.getRankFile(self.endRow, self.endCol) + "Q"
+        if self.pieceMoved[1] == "P":
+            return self.getRankFile(self.endRow, self.endCol)
+        if self.pieceMoved[1] != "P":
+            return self.pieceMoved[1] + self.getRankFile(self.endRow, self.endCol)
     
     def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRanks[r]
