@@ -1,29 +1,90 @@
 #will be logic for a chess bot to make moves
 import ChessEngine
-pieceValue = {"K": 0, "P": 1, "N":3, "B":3, "R":5, "Q":9,"--":0}
+import random
+pieceValue = {"K": 0, "P": 1, "N":3, "B":3, "R":5, "Q":9}
 checkmate = 10000
 stalemate = 0
 
 class ChessBot:
     def __init__(self, gameState):
         self.gameState = gameState
+        self.piecePositionScores = {"N":self.knightEvaluation(), "wP": self.WhitePawnEvaluation(),"bP":self.blackPawnEvaluation(),"B":self.bishopEvalutation(),
+                                    "R":self.rookEvalutation(),"Q":self.queenEvalutation(), "K":self.kingEvalutation()}
 
     def randomMove(self, validMoves):
         from random import choice
         if len(validMoves) != 0:
             return choice(validMoves)
     
-    def pawnEvaluation(self):
-        pawnEvalutaion = [[2, 2, 2, 2, 2, 2, 2, 2],
-                          [2, 2, 2, 2, 2, 2, 2, 2],
-                          [1.75, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.75],
-                          [1.5, 1.25, 1.75, 1.75, 1, 1, 1.25, 1.5],
-                          [1.25, 1, 1, 1.5, 1.5, 1, 1, 1.25],
-                          [1.25, 1.1, 1.1, 0.95, 0.95, 1.1, 1.1, 1.25],
-                          [.95, .95, .95, .95, .95, .95, .95, .95],
-                          [0, 0, 0, 0, 0, 0, 0, 0],
-                          ]
-        return pawnEvalutaion
+    def WhitePawnEvaluation(self):
+        return [[8,8,8,8,8,8,8,8],
+                [7,7,7,7,7,7,7,7],
+                [6,6,6,6,6,6,6,6],
+                [4,2,3,7,7,3,2,4],
+                [4,2,3,7,7,3,2,4],
+                [3,2,0,2,2,0,2,3],
+                [1,1,1,0,0,1,1,1],
+                [0,0,0,0,0,0,0,0]]
+    
+    def blackPawnEvaluation(self):
+        return [[0,0,0,0,0,0,0,0],
+                [1,1,1,0,0,1,1,1],
+                [3,2,0,2,2,0,2,2],
+                [4,2,3,7,7,3,2,2],
+                [4,2,3,7,7,3,2,2],
+                [6,6,6,6,6,6,6,6],
+                [7,7,7,7,7,7,7,7],
+                [8,8,8,8,8,8,8,8]]
+    
+    def knightEvaluation(self):
+        return [[1,1,1,1,1,1,1,1],
+                [1,2,2,2,2,2,2,1],
+                [1,2,3,3,3,3,2,1],
+                [1,2,3,4,4,3,2,1],
+                [1,2,3,4,4,3,2,1],
+                [1,2,3,3,3,3,3,1],
+                [1,2,2,2,2,2,2,1],
+                [1,1,1,1,1,1,1,1]]
+    
+    def bishopEvalutation(self):
+        return [[4,3,2,1,1,2,3,4],
+                [3,4,2,2,2,2,4,3],
+                [2,3,4,3,3,4,3,2],
+                [1,2,3,4,4,3,2,1],
+                [1,2,3,4,4,3,2,1],
+                [2,3,4,3,3,4,3,2],
+                [3,4,3,2,2,3,4,3],
+                [4,3,2,1,1,2,3,4]]
+    
+    def rookEvalutation(self):
+        return [[4,3,4,4,4,4,3,4],
+                [4,4,4,4,4,4,4,4],
+                [3,3,3,3,3,3,3,3],
+                [1,2,3,4,4,3,2,1],
+                [1,2,3,4,4,3,2,1],
+                [3,3,3,3,3,3,3,3],
+                [4,4,4,4,4,4,4,4],
+                [4,3,4,4,4,4,3,4]]
+    
+    def kingEvalutation(self):
+        return [[1,3,4,1,1,3,4,3],
+                [2,2,2,1,1,2,2,2],
+                [1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1],
+                [2,2,2,2,2,2,2,2],
+                [3,4,4,1,1,1,4,3]]
+    
+    def queenEvalutation(self):
+        return [[1,1,1,3,1,1,1,1],
+                [1,1,1,1,1,1,1,1],
+                [1,1,1,2,2,1,1,1],
+                [1,1,3,3,3,3,1,1],
+                [1,1,3,3,3,2,1,1],
+                [1,1,2,2,2,1,1,1],
+                [1,1,1,1,1,1,1,1],
+                [1,1,1,3,1,1,1,1]]
 
     def evaluateBoard(self, gs):
         # An advanced board evaluation function considering multiple factors
@@ -55,20 +116,6 @@ class ChessBot:
         else:
             pass
 
-
-        #if board[3][3] in ['bN','bB','bR','bQ'] or board[3][4] in ['bN','bB','bR','bQ'] or board[4][3] in ['bN','bB','bR','bQ'] or board[4][4] in ['bN','bB','bR','bQ']:
-            #CenterControl += -0.1
-        if board[3][3] in ['bP'] or board[3][4] in ['bP'] or board[4][3] in ['bP'] or board[4][4] in ['bP']:
-            CenterControl += -2
-        if board[2][2] in ['bN']:
-            pieceActivity += -0.1
-        if board[2][5] in ['bN']:
-            pieceActivity += -0.1
-        if board[0][6] == 'bK' or board[0][3] == 'bk':
-            KingSafety += -5
-        if board[2][5] in ['bQ']:
-            pieceActivity += 10
-
         if self.gameState.moveLog:
             lastMove = self.gameState.moveLog[-1]
             pass
@@ -80,12 +127,21 @@ class ChessBot:
     def simpleBoardEvaluation(self):
         board = self.gameState.board
         pieceEvaluation = 0
-        for row in board:
-            for square in row:
+        for row in range(len(board)):
+            for col in range(len(board[row])):
+                square = board[row][col]
+                if square != "--":
+                    #score it positionally
+                    piecePositionScore = 0
+                    if square[1] != "P":
+                        piece = square[1]
+                    else:
+                        piece = square
+                    piecePositionScore = self.piecePositionScores[piece][row][col]
                 if square[0] == "w":
-                    pieceEvaluation += pieceValue[square[1]]
+                    pieceEvaluation += pieceValue[square[1]] + piecePositionScore * 0.1
                 if square[0] == "b":
-                    pieceEvaluation -= pieceValue[square[1]]
+                    pieceEvaluation -= pieceValue[square[1]] + piecePositionScore * 0.1
         return pieceEvaluation
         
     def minMax(self, gs, depth, whiteToMove):
@@ -128,11 +184,12 @@ class ChessBot:
     # Alpha-Beta pruning implementation
     def alphaBeta(self, gs, alpha, beta, depth):
         if depth == 0:
-            return self.evaluateBoard(gs)
+            return self.simpleBoardEvaluation()
         maxEval = -float('inf')
+        validMoves = gs.getValidMoves().random.shuffle
         if gs.stalemate:
             return stalemate
-        for move in gs.getValidMoves():
+        for move in validMoves:
             gs.makeMove(move)
             eval = -self.alphaBeta(gs, -beta, -alpha, depth - 1)
             gs.undoMove()
@@ -151,6 +208,7 @@ class ChessBot:
         #impliment move ordering later
         for move in gs.getValidMoves():
             gs.makeMove(move)
+            # if move.pieceCaptured != "--": potential for move ordering
             eval = -self.negaMaxAlphaBeta(gs, depth - 1, -beta, -alpha, -color)
             gs.undoMove()
             if eval > maxEval:
