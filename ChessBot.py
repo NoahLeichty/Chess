@@ -1,4 +1,7 @@
 #will be logic for a chess bot to make moves
+
+#can add transposition tables, bitmapping, save moves
+
 import ChessEngine
 import random
 pieceValue = {"K": 0, "P": 1, "N":3, "B":3, "R":5, "Q":9}
@@ -19,9 +22,9 @@ class ChessBot:
     def WhitePawnEvaluation(self):
         return [[8,8,8,8,8,8,8,8],
                 [7,7,7,7,7,7,7,7],
-                [6,6,6,6,6,6,6,6],
-                [4,2,3,7,7,3,2,4],
-                [4,2,3,7,7,3,2,4],
+                [6,6,6,7,7,6,6,6],
+                [4,2,3,6,6,3,2,4],
+                [3,1,3,6,6,3,1,3],
                 [3,2,0,2,2,0,2,3],
                 [1,1,1,0,0,1,1,1],
                 [0,0,0,0,0,0,0,0]]
@@ -29,10 +32,10 @@ class ChessBot:
     def blackPawnEvaluation(self):
         return [[0,0,0,0,0,0,0,0],
                 [1,1,1,0,0,1,1,1],
-                [3,2,0,2,2,0,2,2],
-                [4,2,3,7,7,3,2,2],
-                [4,2,3,7,7,3,2,2],
-                [6,6,6,6,6,6,6,6],
+                [2,2,0,2,2,0,2,2],
+                [3,2,3,6,6,3,2,3],
+                [4,2,3,6,6,3,2,2],
+                [6,6,6,7,7,6,6,6],
                 [7,7,7,7,7,7,7,7],
                 [8,8,8,8,8,8,8,8]]
     
@@ -67,14 +70,14 @@ class ChessBot:
                 [4,3,4,4,4,4,3,4]]
     
     def kingEvalutation(self):
-        return [[1,3,4,1,1,3,4,3],
-                [2,2,2,1,1,2,2,2],
+        return [[3,4,4,1,1,0,4,3],
+                [2,2,2,0,0,0,2,2],
                 [1,1,1,1,1,1,1,1],
                 [1,1,1,1,1,1,1,1],
                 [1,1,1,1,1,1,1,1],
                 [1,1,1,1,1,1,1,1],
-                [2,2,2,2,2,2,2,2],
-                [3,4,4,1,1,1,4,3]]
+                [2,2,2,0,0,0,2,2],
+                [3,4,4,0,0,-1,4,3]]
     
     def queenEvalutation(self):
         return [[1,1,1,3,1,1,1,1],
@@ -124,7 +127,14 @@ class ChessBot:
         return evaluation + (mobility * 0.1) + (CenterControl) + (KingSafety) + (PawnStructure * 0.03) + (pieceActivity) + totalEvaluation
     
     # A simpler board evaluation function that focuses solely on material count
-    def simpleBoardEvaluation(self):
+    def simpleBoardEvaluation(self,gs):
+        if gs.checkmate:
+            if gs.whiteToMove:
+                return -checkmate
+            else:
+                return checkmate
+        if gs.stalemate:
+            return stalemate
         board = self.gameState.board
         pieceEvaluation = 0
         for row in range(len(board)):
@@ -203,7 +213,7 @@ class ChessBot:
     
     def negaMaxAlphaBeta(self, gs, depth, alpha, beta, color):
         if depth == 0:    
-            return  color * self.evaluateBoard(gs)
+            return  color * self.simpleBoardEvaluation(gs)
         maxEval = -checkmate
         #impliment move ordering later
         for move in gs.getValidMoves():

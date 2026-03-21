@@ -36,7 +36,7 @@ def main():
     sqSelected = () # no square is selected
     playerClicks = [] # keep track of player clicks
     gameOver = False
-    playerOne = False # if a human is playing white, then this will be True. If an AI is playing, then False
+    playerOne = True # if a human is playing white, then this will be True. If an AI is playing, then False
     playerTwo = False # same as above but for black
 
     playWhite = Button(10, 10, 150, 50, "Play White", p.Color('Black'), p.Color('light green'), )

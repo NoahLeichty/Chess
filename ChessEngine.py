@@ -23,6 +23,8 @@ class GameState():
             ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
             ]
         
+        #saves white and blacks possible moves here
+        
         self.moveFunctions = {"P":self.getPawnMoves, "R":self.getRookMoves, "N":self.getKnightMoves,
                               "B":self.getBishopMoves, "Q":self.getQueenMoves, "K": self.getKingMoves}
 
@@ -47,6 +49,7 @@ class GameState():
         self.capturedPiece = None
         self.capturingPiece = None
         self.lastMoves = []
+
 
     def makeMove(self, move):
         self.board[move.startRow][move.startCol] = "--"
@@ -142,6 +145,7 @@ class GameState():
     
     # Generates all moves the all the opponents moves to see if they attack the king
     
+    #change how getValidMoves work ot make it more efficient
     def getValidMoves(self):
         tempEnpassantPossible = self.enpassantPossible
         moves = []
@@ -632,13 +636,6 @@ class Move():
             return self.pieceMoved[1] + "x" + self.getRankFile(self.endRow, self.endCol)
         if self.pieceCaptured != "--" and self.pieceMoved[1] == "P":
             return self.colsToFiles[self.startCol] + "x" + self.getRankFile(self.endRow, self.endCol)
-        if self.endRow == 0 or self.endRow == 7:
-            return self.getRankFile(self.endRow, self.endCol) + "Q"
-        #capturing pawn promotion doesn't work properly
-        if self.pieceCaptured != "--" and self.pieceMoved[1] == "P" and self.endRow == 0:
-            return self.colsToFiles[self.startCol] + "x" + self.getRankFile(self.endRow, self.endCol) + "Q"
-        if self.pieceCaptured != "--" and self.pieceMoved[1] == "P" and self.self.endRow == 7:
-            return self.colsToFiles[self.startCol] + "x" + self.getRankFile(self.endRow, self.endCol) + "Q"
         if self.pieceMoved[1] == "P":
             return self.getRankFile(self.endRow, self.endCol)
         if self.pieceMoved[1] != "P":
