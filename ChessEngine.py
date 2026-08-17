@@ -50,6 +50,15 @@ class GameState():
         self.capturingPiece = None
         self.lastMoves = []
 
+        #These are for 3 move rule
+        self.threefold_repetition = False  # Flag for threefold draw
+        self.position_counts = {}
+        
+        # Record the initial board position
+        initial_pos = self.get_position_string()
+        self.position_counts[initial_pos] = 1
+        self.repetition_history = [initial_pos]
+
 
     def makeMove(self, move):
         self.board[move.startRow][move.startCol] = "--"
@@ -98,6 +107,14 @@ class GameState():
             self.lastMoves.pop(0)
         else:
             self.lastMoves.append(move.getChessNotation())
+
+        # Track threefold repetition position
+        pos_str = self.get_position_string()
+        self.repetition_history.append(pos_str)
+        self.position_counts[pos_str] = self.position_counts.get(pos_str, 0) + 1
+        
+        if self.position_counts[pos_str] >= 3:
+            self.threefold_repetition = True
     
     def undoMove(self):
         if len(self.moveLog) != 0:
@@ -140,6 +157,16 @@ class GameState():
             
             self.checkmate = False
             self.stalemate = False
+
+            # Revert repetition count before undoing board state
+            last_pos = self.repetition_history.pop()
+            if last_pos in self.position_counts:
+                self.position_counts[last_pos] -= 1
+                if self.position_counts[last_pos] == 0:
+                    del self.position_counts[last_pos]
+
+
+            self.threefold_repetition = False
     
     # All moves considering checks
     
@@ -193,15 +220,6 @@ class GameState():
         else:
             self.checkmate = False
             self.stalemate = False
-        
-        count = 0
-        if len(self.moveLog) > 0:
-            if self.moveLog[-1].getChessNotation() in self.lastMoves:
-                count += 1
-            else:
-                count = 0
-        if count >= 3:
-            self.stalemate == True
 
         self.enpassantPossible = tempEnpassantPossible 
         return moves
@@ -583,6 +601,14 @@ class GameState():
                     self.blackCastleQueenside = False
                 elif move.endCol == 7:
                     self.blackCastleKingside = False
+
+    def get_position_string(self):
+        """Generates a unique string snapshot representing the current board state."""
+        board_str = "".join("".join(row) for row in self.board)
+        turn = "w" if self.whiteToMove else "b"
+        castle = f"{self.whiteCastleKingside}{self.whiteCastleQueenside}{self.blackCastleKingside}{self.blackCastleQueenside}"
+        enpassant = str(self.enpassantPossible)
+        return f"{board_str}_{turn}_{castle}_{enpassant}"
 
 class CastleRights():
     def __init__(self, wks, bks, wqs, bqs):

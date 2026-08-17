@@ -98,7 +98,7 @@ class ChessBot:
                 return -checkmate
             else:
                 return checkmate
-        if gs.stalemate:
+        if gs.stalemate or gs.threefold_repetition:
             return stalemate
         
         pieceEvaluation = 0
@@ -133,7 +133,7 @@ class ChessBot:
                 return -checkmate
             else:
                 return checkmate
-        if gs.stalemate:
+        if gs.stalemate or gs.threefold_repetition:
             return stalemate
         board = self.gameState.board
         pieceEvaluation = 0
