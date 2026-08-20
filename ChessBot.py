@@ -197,7 +197,7 @@ class ChessBot:
             return self.simpleBoardEvaluation()
         maxEval = -float('inf')
         validMoves = gs.getValidMoves().random.shuffle
-        if gs.stalemate:
+        if gs.stalemate or gs.threefold_repetition:
             return stalemate
         for move in validMoves:
             gs.makeMove(move)
